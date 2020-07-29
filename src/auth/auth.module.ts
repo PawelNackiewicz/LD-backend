@@ -13,6 +13,7 @@ import { ConfigService } from '../config/config.service';
   imports: [
     UsersModule,
     PassportModule,
+    ConfigModule.register({ folder: './config' }),
     JwtModule.registerAsync({
       imports: [ConfigModule.register({ folder: './config' })],
       useFactory: async (configService: ConfigService) => ({
