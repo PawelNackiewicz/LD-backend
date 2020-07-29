@@ -6,11 +6,7 @@ import { CreateFacilityDto } from '../dto/create-facility.dto';
 
 @Injectable()
 export class FacilityService {
-  constructor(
-    @InjectModel(Facility.name) private facilityModel: Model<Facility>,
-    @InjectConnection() private connection: Connection,
-  ) {
-  }
+  constructor(@InjectModel(Facility.name) private facilityModel: Model<Facility>) {}
 
   async create(createFacilityDto: CreateFacilityDto): Promise<void> {
     try {
