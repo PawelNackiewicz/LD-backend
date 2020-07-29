@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
-import { AppController } from './app.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import { FacilityModule } from './facility/facility.module';
 
@@ -12,7 +11,7 @@ import { FacilityModule } from './facility/facility.module';
     MongooseModule.forRoot('mongodb://localhost/nest'),
     FacilityModule,
   ],
-  controllers: [AppController],
+  controllers: [],
   providers: [],
 })
 export class AppModule {}
