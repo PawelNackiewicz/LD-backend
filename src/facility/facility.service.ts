@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectConnection, InjectModel } from '@nestjs/mongoose';
-import { Facility } from './schemas/facility.schema';
+import { Facility } from './models/facility.schema';
 import { Connection, Model } from 'mongoose';
-import { CreateFacilityDto } from './dto/create-facility.dto';
+import { CreateFacilityDto } from './models/create-facility.dto';
 
 @Injectable()
 export class FacilityService {

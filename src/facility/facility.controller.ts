@@ -9,8 +9,8 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { FacilityService } from './facility.service';
-import { CreateFacilityDto } from './dto/create-facility.dto';
-import { Facility } from './schemas/facility.schema';
+import { CreateFacilityDto } from './models/create-facility.dto';
+import { Facility } from './models/facility.schema';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 @Controller('facility')
