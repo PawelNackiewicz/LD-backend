@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectConnection, InjectModel } from '@nestjs/mongoose';
 import { Facility } from '../schemas/facility.schema';
-import { Connection, DocumentQuery, Model } from 'mongoose';
+import { Connection, Model } from 'mongoose';
 import { CreateFacilityDto } from '../dto/create-facility.dto';
 
 @Injectable()
@@ -9,37 +9,50 @@ export class FacilityService {
   constructor(
     @InjectModel(Facility.name) private facilityModel: Model<Facility>,
     @InjectConnection() private connection: Connection,
-  ) {}
+  ) {
+  }
 
-  async create(createFacilityDto: CreateFacilityDto): Promise<Facility> {
-    const createdFacility = new this.facilityModel(createFacilityDto);
-    return createdFacility.save();
+  async create(createFacilityDto: CreateFacilityDto): Promise<void> {
+    try {
+      const createdFacility = new this.facilityModel(createFacilityDto);
+      await createdFacility.save();
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   async findAll(): Promise<Facility[]> {
-    return this.facilityModel.find().exec();
+    try {
+      return this.facilityModel.find().exec();
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   async find(id: number): Promise<Facility> {
-    const facility: DocumentQuery<
-      Facility | null,
-      Facility,
-      {}
-    > = this.facilityModel.findById(id);
-    if (!facility) throw new Error('No facility found.');
-    return facility;
+    try {
+      return this.facilityModel.findById(id);
+    } catch (e) {
+      console.error(e);
+    }
   }
 
-  async update(id: string, createFacilityDto: CreateFacilityDto) {
-    const updateItem = await this.facilityModel.findByIdAndUpdate(
-      id,
-      createFacilityDto,
-    );
-    if (!updateItem) throw new Error('No facility found.');
+  async update(id: string, createFacilityDto: CreateFacilityDto): Promise<void> {
+    try {
+      await this.facilityModel.findByIdAndUpdate(
+        id,
+        createFacilityDto,
+      );
+    } catch (e) {
+      console.error(e);
+    }
   }
 
-  async delete(id: number) {
-    const deleteItem = await this.facilityModel.findByIdAndDelete(id);
-    if (!deleteItem) throw new Error('No facility found.');
+  async delete(id: number): Promise<void> {
+    try {
+      await this.facilityModel.findByIdAndDelete(id);
+    } catch (e) {
+      console.error(e);
+    }
   }
 }
