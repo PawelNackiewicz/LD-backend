@@ -52,7 +52,7 @@ $ npm run start:prod
 First you should register a user
 
 # http://localhost:7000/auth/register   - POST
-body:   {"username": "user", "password": "password"}
+body:   {"email": "email@email.com", "password": "password"}
 
 Next login endpoint
 # http://localhost:7000/auth/login      - POST

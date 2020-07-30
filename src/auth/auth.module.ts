@@ -20,12 +20,11 @@ import { ConfigService } from '../config/config.service';
         secret: configService.get('JWT_SECRET'),
         signOptions: { expiresIn: '10m' },
       }),
-      inject: [ConfigService]
-    })
+      inject: [ConfigService],
+    }),
   ],
   providers: [AuthService, LocalStrategy, JwtStrategy],
   exports: [AuthService],
   controllers: [AuthController],
 })
-export class AuthModule {
-}
+export class AuthModule {}

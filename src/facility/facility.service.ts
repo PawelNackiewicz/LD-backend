@@ -6,7 +6,9 @@ import { CreateFacilityDto } from './models/create-facility.dto';
 
 @Injectable()
 export class FacilityService {
-  constructor(@InjectModel(Facility.name) private facilityModel: Model<Facility>) {}
+  constructor(
+    @InjectModel(Facility.name) private facilityModel: Model<Facility>,
+  ) {}
 
   async create(createFacilityDto: CreateFacilityDto): Promise<void> {
     try {
@@ -33,12 +35,12 @@ export class FacilityService {
     }
   }
 
-  async update(id: string, createFacilityDto: CreateFacilityDto): Promise<void> {
+  async update(
+    id: string,
+    createFacilityDto: CreateFacilityDto,
+  ): Promise<void> {
     try {
-      await this.facilityModel.findByIdAndUpdate(
-        id,
-        createFacilityDto,
-      );
+      await this.facilityModel.findByIdAndUpdate(id, createFacilityDto);
     } catch (e) {
       console.error(e);
     }
