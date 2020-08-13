@@ -1,6 +1,5 @@
 import { Module } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { UsersModule } from '../users/users.module';
 import { PassportModule } from '@nestjs/passport';
 import { LocalStrategy } from './local.strategy';
 import { JwtModule } from '@nestjs/jwt';
@@ -8,11 +7,16 @@ import { JwtStrategy } from './jwt.strategy';
 import { AuthController } from './auth.controller';
 import { ConfigModule } from '../config/config.module';
 import { ConfigService } from '../config/config.service';
+import { UserModule } from '../users/users.module';
+import { MailModule } from '../mail/mail.module';
+import { TokenModule } from '../token/token.module';
 
 @Module({
   imports: [
-    UsersModule,
+    UserModule,
     PassportModule,
+    MailModule,
+    TokenModule,
     ConfigModule.register({ folder: './config' }),
     JwtModule.registerAsync({
       imports: [ConfigModule.register({ folder: './config' })],
