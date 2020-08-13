@@ -11,6 +11,8 @@ import { AuthService } from './auth.service';
 import { LocalAuthGuard } from './local-auth.guard';
 import { JwtAuthGuard } from './jwt-auth.guard';
 import { CreateUserDto } from '../users/dto/create-user.dto';
+import { LoginDto } from './dto/login.dto';
+import { IReadableUser } from '../users/interfaces/readable-user.interface';
 
 @Controller('auth')
 export class AuthController {
@@ -22,8 +24,8 @@ export class AuthController {
   }
 
   @Post('login')
-  async login(@Request() req) {
-    return this.authService.login(req.body);
+  async login(@Body(new ValidationPipe()) loginDto: LoginDto): Promise<IReadableUser> {
+    return await this.authService.login(loginDto);
   }
 
   @UseGuards(JwtAuthGuard)

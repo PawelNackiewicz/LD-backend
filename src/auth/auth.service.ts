@@ -1,14 +1,22 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, MethodNotAllowedException } from '@nestjs/common';
 import { UserService } from '../users/user.service';
 import { JwtService } from '@nestjs/jwt';
 import { MailService } from '../mail/mail.service';
-import { IUser} from '../users/interfaces/user.interface';
+import { IUser } from '../users/interfaces/user.interface';
 import { ConfigService } from '../config/config.service';
 import { TokenService } from '../token/token.service';
 import * as bcrypt from 'bcrypt';
 import { CreateUserDto } from '../users/dto/create-user.dto';
 import { roleEnum } from '../users/enums/role.enums';
-import { LoginDto } from './model/login.dto';
+import { IReadableUser } from '../users/interfaces/readable-user.interface';
+import { statusEnum } from '../users/enums/status.enums';
+import { ITokenPayload } from './interfaces/token-payload.interface';
+import * as _ from 'lodash';
+import * as moment from 'moment';
+import { SignOptions } from 'jsonwebtoken';
+import { CreateUserTokenDto } from '../token/dto/create-user-token.dto';
+import { userSensitiveFieldsEnum } from '../users/enums/protected-fields.enum';
+import { LoginDto } from './dto/login.dto';
 
 type LoginSuccessResponse = {
   access_token: string;
@@ -36,11 +44,48 @@ export class AuthService {
     }
   }
 
-  login(user: LoginDto): LoginSuccessResponse {
-    const payload = { email: user.email };
-    return {
-      access_token: this.jwtService.sign(payload),
+  async login({email, password}: LoginDto): Promise<IReadableUser> {
+    const user = await this.userService.findByEmail(email);
+
+    if (user && (await bcrypt.compare(password, user.password))) {
+      const token = await this.signUser(user);
+      const readableUser = user.toObject() as IReadableUser;
+      readableUser.accessToken = token;
+
+      return _.omit<any>(readableUser, Object.values(userSensitiveFieldsEnum)) as IReadableUser;
+    }
+    throw new BadRequestException('Invalid credentials');
+  }
+
+  async signUser(user: IUser, withStatusCheck: boolean = true): Promise<string> {
+    if (withStatusCheck && (user.status !== statusEnum.active)) {
+      throw new MethodNotAllowedException();
+    }
+    const tokenPayload: ITokenPayload = {
+      _id: user._id,
+      status: user.status,
+      roles: user.roles,
     };
+    const token = await this.generateToken(tokenPayload);
+    const expireAt = moment()
+      .add(1, 'day')
+      .toISOString();
+
+    await this.saveToken({
+      token,
+      expireAt,
+      uId: user._id,
+    });
+
+    return token;
+  }
+
+  private async generateToken(data: ITokenPayload, options?: SignOptions): Promise<string> {
+    return this.jwtService.sign(data, options);
+  }
+
+  private async saveToken(createUserTokenDto: CreateUserTokenDto) {
+    return await this.tokenService.create(createUserTokenDto);
   }
 
   async register(createUserDto: CreateUserDto): Promise<boolean> {
