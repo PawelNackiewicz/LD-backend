@@ -11,11 +11,10 @@ import { CreateUserDto } from '../users/dto/create-user.dto';
 import { LoginDto } from './dto/login.dto';
 import { IReadableUser } from '../users/interfaces/readable-user.interface';
 import { SetCookies } from '@nestjsplus/cookies/index';
-import { CookieService } from '../cookie/cookie.service';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService, private readonly cookieService: CookieService) {}
+  constructor(private readonly authService: AuthService) {}
 
   @Post('register')
   async signUp(@Body(new ValidationPipe()) createUserDto: CreateUserDto): Promise<boolean> {
