@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, MethodNotAllowedException } from '@nestjs/common';
+import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { UserService } from '../users/user.service';
 import { JwtService } from '@nestjs/jwt';
 import { MailService } from '../mail/mail.service';
@@ -31,7 +31,7 @@ export class AuthService {
     private jwtService: JwtService,
     private mailService: MailService,
     private configService: ConfigService,
-    private tokenService: TokenService
+    private tokenService: TokenService,
   ) {
     this.clientAppUrl = this.configService.get('DOMAIN_MAIL');
   }
@@ -44,7 +44,10 @@ export class AuthService {
     }
   }
 
-  async login({email, password}: LoginDto): Promise<IReadableUser> {
+  async login({ email, password }: LoginDto): Promise<IReadableUser> {
+    //1. check if is cookie to authentication
+
+    //2 check if user with this login and hash password exist
     const user = await this.userService.findByEmail(email);
 
     if (user && (await bcrypt.compare(password, user.password))) {
@@ -54,12 +57,12 @@ export class AuthService {
 
       return _.omit<any>(readableUser, Object.values(userSensitiveFieldsEnum)) as IReadableUser;
     }
-    throw new BadRequestException('Invalid credentials');
+    throw new NotFoundException('Invalid credentials');
   }
 
   async signUser(user: IUser, withStatusCheck: boolean = true): Promise<string> {
     if (withStatusCheck && (user.status !== statusEnum.active)) {
-      throw new MethodNotAllowedException();
+      throw new UnauthorizedException();
     }
     const tokenPayload: ITokenPayload = {
       _id: user._id,
