@@ -5,6 +5,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { FacilityModule } from './facility/facility.module';
 import { ConfigModule } from './config/config.module';
 import { MailModule } from './mail/mail.module';
+import { CookieModule } from './cookie/cookie.module';
 
 @Module({
   imports: [
@@ -13,7 +14,8 @@ import { MailModule } from './mail/mail.module';
     UserModule,
     MongooseModule.forRoot('mongodb://localhost/nest'),
     FacilityModule,
-    MailModule
+    MailModule,
+    CookieModule
   ],
   controllers: [],
   providers: [],
