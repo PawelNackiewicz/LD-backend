@@ -24,6 +24,7 @@ export class AuthController {
   @Post('login')
   @SetCookies()
   async login(@Request() req, @Body(new ValidationPipe()) loginDto: LoginDto): Promise<IReadableUser> {
+    // 6. 7. set cookies
     const user = await this.authService.login(loginDto);
     req._cookies = [
       {
