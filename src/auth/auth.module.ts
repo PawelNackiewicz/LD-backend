@@ -1,12 +1,8 @@
 import { Module } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { PassportModule } from '@nestjs/passport';
-import { LocalStrategy } from './local.strategy';
-import { JwtModule } from '@nestjs/jwt';
-import { JwtStrategy } from './jwt.strategy';
 import { AuthController } from './auth.controller';
 import { ConfigModule } from '../config/config.module';
-import { ConfigService } from '../config/config.service';
 import { UserModule } from '../users/users.module';
 import { MailModule } from '../mail/mail.module';
 import { TokenModule } from '../token/token.module';
@@ -18,16 +14,8 @@ import { TokenModule } from '../token/token.module';
     MailModule,
     TokenModule,
     ConfigModule.register({ folder: './config' }),
-    JwtModule.registerAsync({
-      imports: [ConfigModule.register({ folder: './config' })],
-      useFactory: async (configService: ConfigService) => ({
-        secret: configService.get('JWT_SECRET'),
-        signOptions: { expiresIn: '10m' },
-      }),
-      inject: [ConfigService],
-    }),
   ],
-  providers: [AuthService, LocalStrategy, JwtStrategy],
+  providers: [AuthService],
   exports: [AuthService],
   controllers: [AuthController],
 })

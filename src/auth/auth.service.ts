@@ -6,6 +6,7 @@ import { IUser } from '../users/interfaces/user.interface';
 import { ConfigService } from '../config/config.service';
 import { TokenService } from '../token/token.service';
 import * as bcrypt from 'bcrypt';
+import * as crypto from 'crypto';
 import { CreateUserDto } from '../users/dto/create-user.dto';
 import { roleEnum } from '../users/enums/role.enums';
 import { IReadableUser } from '../users/interfaces/readable-user.interface';
@@ -13,14 +14,9 @@ import { statusEnum } from '../users/enums/status.enums';
 import { ITokenPayload } from './interfaces/token-payload.interface';
 import * as _ from 'lodash';
 import * as moment from 'moment';
-import { SignOptions } from 'jsonwebtoken';
 import { CreateUserTokenDto } from '../token/dto/create-user-token.dto';
 import { userSensitiveFieldsEnum } from '../users/enums/protected-fields.enum';
 import { LoginDto } from './dto/login.dto';
-
-type LoginSuccessResponse = {
-  access_token: string;
-};
 
 @Injectable()
 export class AuthService {
@@ -28,7 +24,6 @@ export class AuthService {
 
   constructor(
     private userService: UserService,
-    private jwtService: JwtService,
     private mailService: MailService,
     private configService: ConfigService,
     private tokenService: TokenService,
@@ -45,9 +40,9 @@ export class AuthService {
   }
 
   async login({ email, password }: LoginDto): Promise<IReadableUser> {
-    //1. check if is cookie to authentication
+    //2. check if is cookie to authentication
 
-    //2 check if user with this login and hash password exist
+    //3. check if user with this login and hash password exist
     const user = await this.userService.findByEmail(email);
 
     if (user && (await bcrypt.compare(password, user.password))) {
@@ -64,16 +59,13 @@ export class AuthService {
     if (withStatusCheck && (user.status !== statusEnum.active)) {
       throw new UnauthorizedException();
     }
-    const tokenPayload: ITokenPayload = {
-      _id: user._id,
-      status: user.status,
-      roles: user.roles,
-    };
-    const token = await this.generateToken(tokenPayload);
+    // 4. generate token
+    const token = await AuthService.generateToken();
     const expireAt = moment()
       .add(1, 'day')
       .toISOString();
 
+    // 5. save token with user and expired time in database
     await this.saveToken({
       token,
       expireAt,
@@ -83,8 +75,9 @@ export class AuthService {
     return token;
   }
 
-  private async generateToken(data: ITokenPayload, options?: SignOptions): Promise<string> {
-    return this.jwtService.sign(data, options);
+  private static async generateToken(): Promise<string> {
+    // TODO check better method to generate token
+    return crypto.randomBytes(48).toString('hex');
   }
 
   private async saveToken(createUserTokenDto: CreateUserTokenDto) {

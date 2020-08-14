@@ -4,15 +4,13 @@ import {
   Get,
   Post,
   Request,
-  UseGuards,
   ValidationPipe,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { LocalAuthGuard } from './local-auth.guard';
-import { JwtAuthGuard } from './jwt-auth.guard';
 import { CreateUserDto } from '../users/dto/create-user.dto';
 import { LoginDto } from './dto/login.dto';
 import { IReadableUser } from '../users/interfaces/readable-user.interface';
+import { SetCookies } from '@nestjsplus/cookies/index';
 
 @Controller('auth')
 export class AuthController {
@@ -24,11 +22,21 @@ export class AuthController {
   }
 
   @Post('login')
-  async login(@Body(new ValidationPipe()) loginDto: LoginDto): Promise<IReadableUser> {
-    return await this.authService.login(loginDto);
+  @SetCookies({name: 'token', value: 'token'})
+  async login(@Request() req, @Body(new ValidationPipe()) loginDto: LoginDto): Promise<IReadableUser> {
+    const user = await this.authService.login(loginDto);
+    req._cookies = [
+      {
+        name: 'token',
+        value: user.accessToken,
+        options: {
+          secure: true,
+          httpOnly: true,
+        },
+      }];
+    return user;
   }
 
-  @UseGuards(JwtAuthGuard)
   @Get('profile')
   getProfile(@Request() req) {
     return req.user;

@@ -11,7 +11,6 @@ import {
 import { FacilityService } from './facility.service';
 import { CreateFacilityDto } from './models/create-facility.dto';
 import { Facility } from './models/facility.schema';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 @Controller('facility')
 export class FacilityController {
@@ -27,13 +26,11 @@ export class FacilityController {
     return this.facilityService.find(id);
   }
 
-  @UseGuards(JwtAuthGuard)
   @Post()
   async create(@Body() createFacilityDto: CreateFacilityDto) {
     await this.facilityService.create(createFacilityDto);
   }
 
-  @UseGuards(JwtAuthGuard)
   @Put(':id')
   async update(
     @Param('id') id: string,
@@ -42,7 +39,6 @@ export class FacilityController {
     return this.facilityService.update(id, createFacilityDto);
   }
 
-  @UseGuards(JwtAuthGuard)
   @Delete(':id')
   async delete(@Param('id') id: number) {
     return this.facilityService.delete(id).then();
