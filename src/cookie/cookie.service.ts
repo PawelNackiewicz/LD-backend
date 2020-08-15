@@ -1,6 +1,16 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Request } from '@nestjs/common';
+import { CookiesRequest } from './interfaces/cookiesRequest.interface';
 
 @Injectable()
 export class CookieService {
-  constructor() {}
+  async setCookie(req: CookiesRequest, token: string): Promise<Object> {
+    return req._cookies = [
+      {
+        name: 'token',
+        value: token,
+        options: {
+          httpOnly: true,
+        },
+      }];
+  }
 }

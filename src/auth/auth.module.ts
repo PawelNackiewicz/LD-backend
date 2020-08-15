@@ -6,6 +6,7 @@ import { ConfigModule } from '../config/config.module';
 import { UserModule } from '../users/users.module';
 import { MailModule } from '../mail/mail.module';
 import { TokenModule } from '../token/token.module';
+import { CookieModule } from '../cookie/cookie.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { TokenModule } from '../token/token.module';
     MailModule,
     TokenModule,
     ConfigModule.register({ folder: './config' }),
+    CookieModule
   ],
   providers: [AuthService],
   exports: [AuthService],

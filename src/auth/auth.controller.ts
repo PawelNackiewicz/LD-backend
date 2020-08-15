@@ -11,10 +11,11 @@ import { CreateUserDto } from '../users/dto/create-user.dto';
 import { LoginDto } from './dto/login.dto';
 import { IReadableUser } from '../users/interfaces/readable-user.interface';
 import { SetCookies } from '@nestjsplus/cookies/index';
+import { CookieService } from '../cookie/cookie.service';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(private readonly authService: AuthService, private readonly cookieService: CookieService) {}
 
   @Post('register')
   async signUp(@Body(new ValidationPipe()) createUserDto: CreateUserDto): Promise<boolean> {
@@ -26,14 +27,7 @@ export class AuthController {
   async login(@Request() req, @Body(new ValidationPipe()) loginDto: LoginDto): Promise<IReadableUser> {
     // 6. 7. set cookies
     const user = await this.authService.login(loginDto);
-    req._cookies = [
-      {
-        name: 'token',
-        value: user.accessToken,
-        options: {
-          httpOnly: true,
-        },
-      }];
+    await this.cookieService.setCookie(req, user.accessToken);
     return user;
   }
 
