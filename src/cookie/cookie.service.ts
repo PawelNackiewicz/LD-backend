@@ -3,8 +3,8 @@ import { CookiesRequest } from './interfaces/cookiesRequest.interface';
 
 @Injectable()
 export class CookieService {
-  async setCookie(req: CookiesRequest, token: string) {
-    return req._cookies = [
+  setCookie(req: CookiesRequest, token: string) {
+    req._cookies = [
       {
         name: 'token',
         value: token,

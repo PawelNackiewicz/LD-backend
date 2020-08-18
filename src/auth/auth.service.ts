@@ -1,6 +1,5 @@
 import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { UserService } from '../users/user.service';
-import { JwtService } from '@nestjs/jwt';
 import { MailService } from '../mail/mail.service';
 import { IUser } from '../users/interfaces/user.interface';
 import { ConfigService } from '../config/config.service';
@@ -11,7 +10,6 @@ import { CreateUserDto } from '../users/dto/create-user.dto';
 import { roleEnum } from '../users/enums/role.enums';
 import { IReadableUser } from '../users/interfaces/readable-user.interface';
 import { statusEnum } from '../users/enums/status.enums';
-import { ITokenPayload } from './interfaces/token-payload.interface';
 import * as _ from 'lodash';
 import * as moment from 'moment';
 import { CreateUserTokenDto } from '../token/dto/create-user-token.dto';
@@ -69,7 +67,7 @@ export class AuthService {
     await this.saveToken({
       token,
       expireAt,
-      uId: user._id,
+      userId: user._id,
     });
 
     return token;
@@ -102,5 +100,16 @@ export class AuthService {
                 <p>Please use this <a href="${confirmLink}">link</a> to confirm your account.</p>
             `,
     });
+  }
+
+  async getUserInfo(token: string): Promise<IReadableUser> {
+    const userId = await this.tokenService.getUserId(this.parseToken(token));
+    return await this.userService.find(userId);
+  }
+
+  parseToken(token: string): string {
+    const prefix = 'token=';
+    if (token.includes(prefix)) return token.split(prefix).pop();
+    return token;
   }
 }
