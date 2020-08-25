@@ -6,6 +6,7 @@ import { ConfigService } from '../config/config.service';
 import { TokenService } from '../token/token.service';
 import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
+import { JWE, JWK, JWT } from 'jose';
 import { CreateUserDto } from '../users/dto/create-user.dto';
 import { roleEnum } from '../users/enums/role.enums';
 import { IReadableUser } from '../users/interfaces/readable-user.interface';
@@ -26,15 +27,7 @@ export class AuthService {
     private configService: ConfigService,
     private tokenService: TokenService,
   ) {
-    this.clientAppUrl = this.configService.get('DOMAIN_MAIL');
-  }
-
-  async validateUser(email: string, password: string): Promise<IUser> {
-    const user = await this.userService.findByEmail(email);
-    if (user && (await bcrypt.compare(password, user.password))) {
-      const { password, ...result } = user; //get all data about user without password
-      return user;
-    }
+    this.clientAppUrl = this.configService.get('DOMAIN');
   }
 
   async login({ email, password }: LoginDto): Promise<IReadableUser> {
@@ -44,7 +37,7 @@ export class AuthService {
     const user = await this.userService.findByEmail(email);
 
     if (user && (await bcrypt.compare(password, user.password))) {
-      const token = await this.signUser(user);
+      const token = await this.tokenService.signUser(user);
       const readableUser = user.toObject() as IReadableUser;
       readableUser.accessToken = token;
 
@@ -53,51 +46,22 @@ export class AuthService {
     throw new NotFoundException('Invalid credentials');
   }
 
-  async signUser(user: IUser, withStatusCheck: boolean = true): Promise<string> {
-    if (withStatusCheck && (user.status !== statusEnum.active)) {
-      throw new UnauthorizedException();
-    }
-    // 4. generate token
-    const token = await AuthService.generateToken();
-    const expireAt = moment()
-      .add(1, 'day')
-      .toISOString();
-
-    // 5. save token with user and expired time in database
-    await this.saveToken({
-      token,
-      expireAt,
-      userId: user._id,
-    });
-
-    return token;
-  }
-
-  private static async generateToken(): Promise<string> {
-    // TODO check better method to generate token
-    return crypto.randomBytes(48).toString('hex');
-  }
-
-  private async saveToken(createUserTokenDto: CreateUserTokenDto) {
-    return await this.tokenService.create(createUserTokenDto);
-  }
-
   async register(createUserDto: CreateUserDto): Promise<boolean> {
     const user = await this.userService.create(createUserDto, [roleEnum.user]);
-    // await this.sendConfirmation(user);
+    await this.sendConfirmation(user);
     return true;
   }
 
   async sendConfirmation(user: IUser) {
-    const token = await this.login(user);
+    const token = await this.tokenService.getRegistrationToken(user.email);
     const confirmLink = `${this.clientAppUrl}/auth/confirm?token=${token}`;
-    await this.mailService.send({
-      from: this.configService.get('DOMAIN_MAIL'),
+    console.log(confirmLink);
+    await this.mailService.sendMail({
       to: user.email,
-      subject: 'Verify User',
-      html: `
-                <h3>Hello ${user.email}!</h3>
-                <p>Please use this <a href="${confirmLink}">link</a> to confirm your account.</p>
+      subject: 'Potwierdzenie rejestracji',
+      content: `
+                <h3>Cześć, ${user.firstName}!</h3>
+                <p>Aby potwierdzić swoje konto i w pełni korzystać z serwisu, wejdź w  ten <a href="${confirmLink}">link</a>.</p>
             `,
     });
   }

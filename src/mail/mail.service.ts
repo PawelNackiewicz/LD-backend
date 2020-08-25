@@ -1,27 +1,37 @@
 import { Injectable } from '@nestjs/common';
-import * as Mailgun from 'mailgun-js';
-import { IMailGunData } from './interfaces/mail.interface';
+import * as nodemailer from 'nodemailer';
 import { ConfigService } from '../config/config.service';
+import { SendMainInterface } from './interfaces/sendMain.interface';
 
 @Injectable()
 export class MailService {
-  private mg: Mailgun.Mailgun;
+
+  private transporter: nodemailer.Transporter;
 
   constructor(private readonly configService: ConfigService) {
-    this.mg = Mailgun({
-      apiKey: this.configService.get('MAILGUN_API_KEY'),
-      domain: this.configService.get('MAILGUN_API_DOMAIN'),
+    this.transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: this.configService.get('DOMAIN_EMAIL'),
+        pass: this.configService.get('DOMAIN_EMAIL_PASSWORD'),
+      },
     });
   }
 
-  send(data: IMailGunData): Promise<Mailgun.messages.SendResponse> {
-    return new Promise((res, rej) => {
-      this.mg.messages().send(data, function (error, body) {
+  sendMail({ to, subject, content }: SendMainInterface) {
+    let options = {
+      from: this.configService.get('DOMAIN_EMAIL'),
+      to: to,
+      subject: subject,
+      html: content,
+    };
+
+    this.transporter.sendMail(
+      options, (error, info) => {
         if (error) {
-          rej(error);
+          return console.log(`error: ${error}`);
         }
-        res(body);
+        console.log(`Message Sent ${info.response}`);
       });
-    });
   }
 }

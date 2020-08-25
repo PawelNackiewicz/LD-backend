@@ -1,12 +1,56 @@
-import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import { ForbiddenException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { IUserToken } from './interfaces/user-token.interface';
 import { CreateUserTokenDto } from './dto/create-user-token.dto';
+import { JWE, JWK, JWT } from 'jose';
+import crypto from "crypto";
+import { IUser } from '../users/interfaces/user.interface';
+import { statusEnum } from '../users/enums/status.enums';
+import * as moment from 'moment';
 
 @Injectable()
 export class TokenService {
+  private readonly JOSE_BITLENGTH = 2048;
+  private readonly jwtKey = JWK.generateSync('oct', this.JOSE_BITLENGTH, { use: 'sig' });
+  private readonly jweKey = JWK.generateSync('RSA', this.JOSE_BITLENGTH, { use: 'enc' });
+
   constructor(@InjectModel('Token') private readonly tokenModel: Model<IUserToken>) {
+  }
+
+  async getRegistrationToken (userEmail: string): Promise<string> {
+    return JWE.encrypt(
+      JWT.sign({ userEmail }, this.jwtKey, {
+        algorithm: 'HS512',
+        expiresIn: '5 minutes',
+      }),
+      this.jweKey,
+    );
+  };
+
+  async signUser(user: IUser, withStatusCheck: boolean = true): Promise<string> {
+    if (withStatusCheck && (user.status !== statusEnum.active)) {
+      throw new UnauthorizedException();
+    }
+    // 4. generate token
+    const token = await TokenService.generateToken();
+    const expireAt = moment()
+      .add(1, 'day')
+      .toISOString();
+
+    // 5. save token with user and expired time in database
+    await this.create({
+      token,
+      expireAt,
+      userId: user._id,
+    });
+
+    return token;
+  }
+
+  private static async generateToken(): Promise<string> {
+    // TODO check better method to generate token
+    return crypto.randomBytes(48).toString('hex');
   }
 
   async create(createUserTokenDto: CreateUserTokenDto): Promise<IUserToken> {
@@ -15,11 +59,11 @@ export class TokenService {
   }
 
   async delete(userId: string, token: string): Promise<{ ok?: number, n?: number }> {
-    return await this.tokenModel.deleteOne({ userId, token });
+    return this.tokenModel.deleteOne({ userId, token });
   }
 
   async deleteAll(userId: string): Promise<{ ok?: number, n?: number }> {
-    return await this.tokenModel.deleteMany({ userId });
+    return this.tokenModel.deleteMany({ userId });
   }
 
   async getUserId(token: string): Promise<string> {

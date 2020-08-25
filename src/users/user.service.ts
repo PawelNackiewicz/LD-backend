@@ -18,10 +18,11 @@ export class UserService {
     return await bcrypt.hash(password, salt);
   }
 
-  async create(createUserDto: CreateUserDto, roles: string[]): Promise<void> {
+  async create(createUserDto: CreateUserDto, roles: string[]): Promise<IUser> {
     const hash = await this.hashPassword(createUserDto.password);
     const createdUser = new this.userModel({...createUserDto, password: hash, roles});
     await createdUser.save();
+    return createdUser;
   }
 
   async find(id: string): Promise<IUser> {
