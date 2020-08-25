@@ -18,7 +18,7 @@ export class TokenService {
   constructor(@InjectModel('Token') private readonly tokenModel: Model<IUserToken>) {
   }
 
-  async getRegistrationToken (userEmail: string): Promise<string> {
+  async getActivationToken (userEmail: string): Promise<string> {
     return JWE.encrypt(
       JWT.sign({ userEmail }, this.jwtKey, {
         algorithm: 'HS512',
@@ -53,6 +53,13 @@ export class TokenService {
     return crypto.randomBytes(48).toString('hex');
   }
 
+  async verifyActivationToken (token: string) {
+    return JWT.verify(JWE.decrypt(token, this.jweKey).toString(), this.jwtKey, {
+      algorithms: ['HS512'],
+      maxTokenAge: '5 minutes',
+    });
+  };
+
   async create(createUserTokenDto: CreateUserTokenDto): Promise<IUserToken> {
     const userToken = new this.tokenModel(createUserTokenDto);
     return await userToken.save();
@@ -64,6 +71,10 @@ export class TokenService {
 
   async deleteAll(userId: string): Promise<{ ok?: number, n?: number }> {
     return this.tokenModel.deleteMany({ userId });
+  }
+
+  async exists(userId: string, token: string): Promise<boolean> {
+    return await this.tokenModel.exists({ userId, token });
   }
 
   async getUserId(token: string): Promise<string> {

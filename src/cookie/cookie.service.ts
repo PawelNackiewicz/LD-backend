@@ -1,9 +1,9 @@
 import { Injectable, Request } from '@nestjs/common';
-import { CookiesRequest } from './interfaces/cookiesRequest.interface';
+import { ICookiesRequest } from './interfaces/cookiesRequest.interface';
 
 @Injectable()
 export class CookieService {
-  setCookie(req: CookiesRequest, token: string) {
+  setCookie(req: ICookiesRequest, token: string) {
     req._cookies = [
       {
         name: 'token',

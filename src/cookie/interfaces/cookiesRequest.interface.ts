@@ -1,6 +1,6 @@
 import { CookieOptions } from 'express';
 
-export interface CookiesRequest {
+export interface ICookiesRequest {
   _cookies: Array<{
     name: string;
     value: string;

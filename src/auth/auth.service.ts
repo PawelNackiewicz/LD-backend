@@ -1,21 +1,20 @@
-import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { UserService } from '../users/user.service';
 import { MailService } from '../mail/mail.service';
 import { IUser } from '../users/interfaces/user.interface';
 import { ConfigService } from '../config/config.service';
 import { TokenService } from '../token/token.service';
 import * as bcrypt from 'bcrypt';
-import * as crypto from 'crypto';
-import { JWE, JWK, JWT } from 'jose';
 import { CreateUserDto } from '../users/dto/create-user.dto';
 import { roleEnum } from '../users/enums/role.enums';
 import { IReadableUser } from '../users/interfaces/readable-user.interface';
 import { statusEnum } from '../users/enums/status.enums';
 import * as _ from 'lodash';
-import * as moment from 'moment';
-import { CreateUserTokenDto } from '../token/dto/create-user-token.dto';
 import { userSensitiveFieldsEnum } from '../users/enums/protected-fields.enum';
 import { LoginDto } from './dto/login.dto';
+import { ForgotPasswordDto } from './dto/forgot-password.dto';
+import { ConfirmAccountDto } from './dto/confirm-account.dto';
+import { ITokenPayload } from '../token/interfaces/token-payload.interface';
 
 @Injectable()
 export class AuthService {
@@ -41,6 +40,7 @@ export class AuthService {
       const readableUser = user.toObject() as IReadableUser;
       readableUser.accessToken = token;
 
+      // TODO remove lodash
       return _.omit<any>(readableUser, Object.values(userSensitiveFieldsEnum)) as IReadableUser;
     }
     throw new NotFoundException('Invalid credentials');
@@ -53,7 +53,7 @@ export class AuthService {
   }
 
   async sendConfirmation(user: IUser) {
-    const token = await this.tokenService.getRegistrationToken(user.email);
+    const token = await this.tokenService.getActivationToken(user.email);
     const confirmLink = `${this.clientAppUrl}/auth/confirm?token=${token}`;
     console.log(confirmLink);
     await this.mailService.sendMail({
@@ -64,6 +64,37 @@ export class AuthService {
                 <p>Aby potwierdzić swoje konto i w pełni korzystać z serwisu, wejdź w  ten <a href="${confirmLink}">link</a>.</p>
             `,
     });
+  }
+
+  async forgotPassword(forgotPasswordDto: ForgotPasswordDto): Promise<void> {
+    const user = await this.userService.findByEmail(forgotPasswordDto.email);
+    if (!user) {
+      // TODO change correct not found
+      throw new NotFoundException('Invalid email');
+    }
+    const token = await this.tokenService.getActivationToken(user.email);
+    const forgotLink = `${this.clientAppUrl}/auth/forgotPassword?token=${token}`;
+
+    await this.mailService.sendMail({
+      to: user.email,
+      subject: 'Forgot Password',
+      content: `
+                <h3>Hello ${user.firstName}!</h3>
+                <p>Please use this <a href="${forgotLink}">link</a> to reset your password.</p>
+            `,
+    });
+  }
+
+  async confirmUser({ token }: ConfirmAccountDto) {
+    const data = await this.tokenService.verifyActivationToken(token) as ITokenPayload;
+    const user = await this.userService.findByEmail(data.userEmail);
+
+    if (user && user.status === statusEnum.pending) {
+      user.status = statusEnum.active;
+      return user.save();
+    }
+    // TODO change correct not found
+    throw new NotFoundException('Confirmation error');
   }
 
   async getUserInfo(token: string): Promise<IReadableUser> {
