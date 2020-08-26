@@ -9,12 +9,11 @@ import { CreateUserDto } from '../users/dto/create-user.dto';
 import { roleEnum } from '../users/enums/role.enums';
 import { IReadableUser } from '../users/interfaces/readable-user.interface';
 import { statusEnum } from '../users/enums/status.enums';
-import * as _ from 'lodash';
-import { userSensitiveFieldsEnum } from '../users/enums/protected-fields.enum';
 import { LoginDto } from './dto/login.dto';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { ConfirmAccountDto } from './dto/confirm-account.dto';
 import { ITokenPayload } from '../token/interfaces/token-payload.interface';
+import { ChangePasswordDto } from './dto/change-password.dto';
 
 @Injectable()
 export class AuthService {
@@ -29,19 +28,14 @@ export class AuthService {
     this.clientAppUrl = this.configService.get('DOMAIN');
   }
 
-  async login({ email, password }: LoginDto): Promise<IReadableUser> {
+  async login({ email, password }: LoginDto): Promise<string> {
     //2. check if is cookie to authentication
 
     //3. check if user with this login and hash password exist
     const user = await this.userService.findByEmail(email);
 
     if (user && (await bcrypt.compare(password, user.password))) {
-      const token = await this.tokenService.signUser(user);
-      const readableUser = user.toObject() as IReadableUser;
-      readableUser.accessToken = token;
-
-      // TODO remove lodash
-      return _.omit<any>(readableUser, Object.values(userSensitiveFieldsEnum)) as IReadableUser;
+      return await this.tokenService.signUser(user);
     }
     throw new NotFoundException('Invalid credentials');
   }
@@ -55,7 +49,6 @@ export class AuthService {
   async sendConfirmation(user: IUser) {
     const token = await this.tokenService.getActivationToken(user.email);
     const confirmLink = `${this.clientAppUrl}/auth/confirm?token=${token}`;
-    console.log(confirmLink);
     await this.mailService.sendMail({
       to: user.email,
       subject: 'Potwierdzenie rejestracji',
@@ -68,10 +61,7 @@ export class AuthService {
 
   async forgotPassword(forgotPasswordDto: ForgotPasswordDto): Promise<void> {
     const user = await this.userService.findByEmail(forgotPasswordDto.email);
-    if (!user) {
-      // TODO change correct not found
-      throw new NotFoundException('Invalid email');
-    }
+    if (!user) return
     const token = await this.tokenService.getActivationToken(user.email);
     const forgotLink = `${this.clientAppUrl}/auth/forgotPassword?token=${token}`;
 
@@ -79,10 +69,18 @@ export class AuthService {
       to: user.email,
       subject: 'Forgot Password',
       content: `
-                <h3>Hello ${user.firstName}!</h3>
-                <p>Please use this <a href="${forgotLink}">link</a> to reset your password.</p>
+                <h3>Cześć ${user.firstName}!</h3>
+                <p>Aby zresetować swoje hasło kliknij w <a href="${forgotLink}">link</a>.</p>
             `,
     });
+  }
+
+  async changePassword(userId: string, changePasswordDto: ChangePasswordDto): Promise<boolean> {
+    const password = await this.userService.hashPassword(changePasswordDto.password);
+
+    await this.userService.update(userId, { password });
+    await this.tokenService.deleteAll(userId);
+    return true;
   }
 
   async confirmUser({ token }: ConfirmAccountDto) {
@@ -93,16 +91,15 @@ export class AuthService {
       user.status = statusEnum.active;
       return user.save();
     }
-    // TODO change correct not found
     throw new NotFoundException('Confirmation error');
   }
 
   async getUserInfo(token: string): Promise<IReadableUser> {
-    const userId = await this.tokenService.getUserId(this.parseToken(token));
+    const userId = await this.tokenService.getUserId(AuthService.parseToken(token));
     return await this.userService.find(userId);
   }
 
-  parseToken(token: string): string {
+  private static parseToken(token: string): string {
     const prefix = 'token=';
     if (token.includes(prefix)) return token.split(prefix).pop();
     return token;

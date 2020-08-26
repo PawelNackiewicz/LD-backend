@@ -49,6 +49,7 @@ export class TokenService {
   }
 
   private static async generateToken(): Promise<string> {
+    console.log(crypto);
     // TODO check better method to generate token
     return crypto.randomBytes(48).toString('hex');
   }

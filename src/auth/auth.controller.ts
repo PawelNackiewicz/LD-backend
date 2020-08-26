@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Query, Request, ValidationPipe } from '@nestjs/common';
+import { Body, Controller, Get, Patch, Post, Query, Request, UseGuards, ValidationPipe } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from '../users/dto/create-user.dto';
 import { LoginDto } from './dto/login.dto';
@@ -8,7 +8,9 @@ import { IReadableUser } from '../users/interfaces/readable-user.interface';
 import { ConfirmAccountDto } from './dto/confirm-account.dto';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
+import { AuthGuard } from '@nestjs/passport';
 import { IUser } from '../users/interfaces/user.interface';
+import { GetUser } from '../components/decorators/get-user.decorator';
 
 @Controller('auth')
 export class AuthController {
@@ -24,8 +26,8 @@ export class AuthController {
   @SetCookies()
   async login(@Request() req, @Body(new ValidationPipe()) loginDto: LoginDto): Promise<void> {
     // 6. 7. set cookies
-    const user = await this.authService.login(loginDto);
-    this.cookieService.setCookie(req, user.accessToken);
+    const accessToken = await this.authService.login(loginDto);
+    this.cookieService.setCookie(req, accessToken);
   }
 
   @Get('session/me')
@@ -43,5 +45,14 @@ export class AuthController {
   @Post('/forgotPassword')
   async forgotPassword(@Body(new ValidationPipe()) forgotPasswordDto: ForgotPasswordDto): Promise<void> {
     return this.authService.forgotPassword(forgotPasswordDto);
+  }
+
+  @Patch('/changePassword')
+  @UseGuards(AuthGuard())
+  async changePassword(
+    @GetUser() user: IUser,
+    @Body(new ValidationPipe()) changePasswordDto: ChangePasswordDto,
+  ): Promise<boolean> {
+    return this.authService.changePassword(user._id, changePasswordDto);
   }
 }
