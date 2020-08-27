@@ -25,7 +25,7 @@ export class AuthService {
     private configService: ConfigService,
     private tokenService: TokenService,
   ) {
-    this.clientAppUrl = this.configService.get('DOMAIN');
+    this.clientAppUrl = this.configService.get('FE_APP_URL');
   }
 
   async login({ email, password }: LoginDto): Promise<string> {

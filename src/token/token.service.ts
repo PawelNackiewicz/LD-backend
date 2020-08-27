@@ -22,7 +22,7 @@ export class TokenService {
     return JWE.encrypt(
       JWT.sign({ userEmail }, this.jwtKey, {
         algorithm: 'HS512',
-        expiresIn: '5 minutes',
+        expiresIn: '8 hours',
       }),
       this.jweKey,
     );
@@ -49,15 +49,14 @@ export class TokenService {
   }
 
   private static async generateToken(): Promise<string> {
-    console.log(crypto);
-    // TODO check better method to generate token
+    console.log(crypto); //undefined
     return crypto.randomBytes(48).toString('hex');
   }
 
   async verifyActivationToken (token: string) {
     return JWT.verify(JWE.decrypt(token, this.jweKey).toString(), this.jwtKey, {
       algorithms: ['HS512'],
-      maxTokenAge: '5 minutes',
+      maxTokenAge: '8 hours',
     });
   };
 
