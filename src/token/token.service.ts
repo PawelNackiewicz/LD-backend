@@ -4,7 +4,7 @@ import { Model } from 'mongoose';
 import { IUserToken } from './interfaces/user-token.interface';
 import { CreateUserTokenDto } from './dto/create-user-token.dto';
 import { JWE, JWK, JWT } from 'jose';
-import crypto from "crypto";
+import * as crypto from "crypto";
 import { IUser } from '../users/interfaces/user.interface';
 import { statusEnum } from '../users/enums/status.enums';
 import * as moment from 'moment';
@@ -49,7 +49,6 @@ export class TokenService {
   }
 
   private static async generateToken(): Promise<string> {
-    console.log(crypto); //undefined
     return crypto.randomBytes(48).toString('hex');
   }
 
