@@ -15,7 +15,7 @@ import { CookieModule } from '../cookie/cookie.module';
     MailModule,
     TokenModule,
     ConfigModule.register({ folder: './config' }),
-    CookieModule
+    CookieModule,
   ],
   providers: [AuthService],
   exports: [AuthService],

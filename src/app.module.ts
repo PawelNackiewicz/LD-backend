@@ -15,7 +15,7 @@ import { CookieModule } from './cookie/cookie.module';
     MongooseModule.forRoot('mongodb://localhost/nest'),
     FacilityModule,
     MailModule,
-    CookieModule
+    CookieModule,
   ],
   controllers: [],
   providers: [],

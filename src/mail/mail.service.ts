@@ -5,7 +5,6 @@ import { SendMainInterface } from './interfaces/sendMain.interface';
 
 @Injectable()
 export class MailService {
-
   private transporter: nodemailer.Transporter;
 
   constructor(private readonly configService: ConfigService) {
@@ -26,12 +25,11 @@ export class MailService {
       html: content,
     };
 
-    this.transporter.sendMail(
-      options, (error, info) => {
-        if (error) {
-          return console.log(`error: ${error}`);
-        }
-        console.log(`Message Sent ${info.response}`);
-      });
+    this.transporter.sendMail(options, (error, info) => {
+      if (error) {
+        return console.log(`error: ${error}`);
+      }
+      console.log(`Message Sent ${info.response}`);
+    });
   }
 }

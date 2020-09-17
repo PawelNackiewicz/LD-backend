@@ -11,6 +11,7 @@ export class CookieService {
         options: {
           httpOnly: true,
         },
-      }];
+      },
+    ];
   }
 }

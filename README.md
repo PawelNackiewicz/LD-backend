@@ -6,7 +6,7 @@
 [travis-url]: https://travis-ci.org/nestjs/nest
 [linux-image]: https://img.shields.io/travis/nestjs/nest/master.svg?label=linux
 [linux-url]: https://travis-ci.org/nestjs/nest
-  
+
   <p align="center">A progressive <a href="http://nodejs.org" target="blank">Node.js</a> framework for building efficient and scalable server-side applications, heavily inspired by <a href="https://angular.io" target="blank">Angular</a>.</p>
     <p align="center">
 <a href="https://www.npmjs.com/~nestjscore"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
@@ -47,7 +47,8 @@ $ npm run start:dev
 $ npm run start:prod
 ```
 
-## API 
+## API
+
 ```$xslt
 First you should register a user
 
@@ -68,13 +69,13 @@ API's with auth
 
 # http://localhost:7000/auth/profile    - GET - get user details
 
-# http://localhost:7000/facility        - POST - add facility 
+# http://localhost:7000/facility        - POST - add facility
 body: {"name": "Facility name", "phone": "123 123 123", "description": "best facility ever"}
 
-# http://localhost:7000/facility/:id        - PUT - update facility 
+# http://localhost:7000/facility/:id        - PUT - update facility
 body: {"name": "Facility name", "phone": "123 123 123", "description": "best facility ever"}
 
-# http://localhost:7000/facility/:id        - DELETE - delete facility 
+# http://localhost:7000/facility/:id        - DELETE - delete facility
 ```
 
 ## Test
@@ -102,4 +103,4 @@ Nest is an MIT-licensed open source project. It can grow thanks to the sponsors 
 
 ## License
 
-  Nest is [MIT licensed](LICENSE).
+Nest is [MIT licensed](LICENSE).

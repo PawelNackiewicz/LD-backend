@@ -20,7 +20,11 @@ export class UserService {
 
   async create(createUserDto: CreateUserDto, roles: string[]): Promise<IUser> {
     const hash = await this.hashPassword(createUserDto.password);
-    const createdUser = new this.userModel({...createUserDto, password: hash, roles});
+    const createdUser = new this.userModel({
+      ...createUserDto,
+      password: hash,
+      roles,
+    });
     await createdUser.save();
     return createdUser;
   }

@@ -7,5 +7,5 @@ export interface IUser extends Document {
   readonly firstName: string;
   readonly roles: Array<string>;
   readonly password: string;
-  readonly marketingPermissions: boolean
+  readonly marketingPermissions: boolean;
 }

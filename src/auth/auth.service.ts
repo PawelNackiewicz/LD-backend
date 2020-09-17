@@ -61,7 +61,7 @@ export class AuthService {
 
   async forgotPassword(forgotPasswordDto: ForgotPasswordDto): Promise<void> {
     const user = await this.userService.findByEmail(forgotPasswordDto.email);
-    if (!user) return
+    if (!user) return;
     const token = await this.tokenService.getActivationToken(user.email);
     const forgotLink = `${this.clientAppUrl}/auth/resetPassword?token=${token}`;
 
@@ -75,17 +75,28 @@ export class AuthService {
     });
   }
 
-  async changePassword(userId: string, changePasswordDto: ChangePasswordDto): Promise<boolean> {
-    const password = await this.userService.hashPassword(changePasswordDto.password);
+  async changePassword(
+    userId: string,
+    changePasswordDto: ChangePasswordDto,
+  ): Promise<boolean> {
+    const password = await this.userService.hashPassword(
+      changePasswordDto.password,
+    );
 
     await this.userService.update(userId, { password });
     await this.tokenService.deleteAll(userId);
     return true;
   }
 
-  async changePasswordByToken(changePasswordDto: ChangePasswordDto): Promise<boolean> {
-    const password = await this.userService.hashPassword(changePasswordDto.password);
-    const data = await this.tokenService.verifyActivationToken(AuthService.parseToken(changePasswordDto.token)) as ITokenPayload;
+  async changePasswordByToken(
+    changePasswordDto: ChangePasswordDto,
+  ): Promise<boolean> {
+    const password = await this.userService.hashPassword(
+      changePasswordDto.password,
+    );
+    const data = (await this.tokenService.verifyActivationToken(
+      AuthService.parseToken(changePasswordDto.token),
+    )) as ITokenPayload;
     const user = await this.userService.findByEmail(data.userEmail);
     await this.userService.update(user._id, { password });
     await this.tokenService.deleteAll(user._id);
@@ -93,7 +104,9 @@ export class AuthService {
   }
 
   async confirmUser({ token }: ConfirmAccountDto) {
-    const data = await this.tokenService.verifyActivationToken(token) as ITokenPayload;
+    const data = (await this.tokenService.verifyActivationToken(
+      token,
+    )) as ITokenPayload;
     const user = await this.userService.findByEmail(data.userEmail);
 
     if (user && user.status === statusEnum.pending) {
@@ -104,7 +117,9 @@ export class AuthService {
   }
 
   async getUserInfo(token: string): Promise<IReadableUser> {
-    const userId = await this.tokenService.getUserId(AuthService.parseToken(token));
+    const userId = await this.tokenService.getUserId(
+      AuthService.parseToken(token),
+    );
     return await this.userService.find(userId);
   }
 

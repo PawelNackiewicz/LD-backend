@@ -1,5 +1,5 @@
 export interface SendMainInterface {
-  to: string,
-  subject: string,
-  content: string
+  to: string;
+  subject: string;
+  content: string;
 }
