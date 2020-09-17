@@ -1,4 +1,4 @@
-import { Injectable, Request } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { ICookiesRequest } from './interfaces/cookiesRequest.interface';
 
 @Injectable()

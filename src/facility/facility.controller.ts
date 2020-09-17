@@ -1,13 +1,4 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Post,
-  Put,
-  UseGuards,
-} from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
 import { FacilityService } from './facility.service';
 import { CreateFacilityDto } from './models/create-facility.dto';
 import { Facility } from './models/facility.schema';
