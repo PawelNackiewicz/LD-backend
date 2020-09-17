@@ -63,7 +63,7 @@ export class AuthService {
     const user = await this.userService.findByEmail(forgotPasswordDto.email);
     if (!user) return
     const token = await this.tokenService.getActivationToken(user.email);
-    const forgotLink = `${this.clientAppUrl}/auth/forgotPassword?token=${token}`;
+    const forgotLink = `${this.clientAppUrl}/auth/resetPassword?token=${token}`;
 
     await this.mailService.sendMail({
       to: user.email,
@@ -80,6 +80,15 @@ export class AuthService {
 
     await this.userService.update(userId, { password });
     await this.tokenService.deleteAll(userId);
+    return true;
+  }
+
+  async changePasswordByToken(changePasswordDto: ChangePasswordDto): Promise<boolean> {
+    const password = await this.userService.hashPassword(changePasswordDto.password);
+    const data = await this.tokenService.verifyActivationToken(AuthService.parseToken(changePasswordDto.token)) as ITokenPayload;
+    const user = await this.userService.findByEmail(data.userEmail);
+    await this.userService.update(user._id, { password });
+    await this.tokenService.deleteAll(user._id);
     return true;
   }
 

@@ -48,11 +48,9 @@ export class AuthController {
   }
 
   @Patch('/changePassword')
-  @UseGuards(AuthGuard())
   async changePassword(
-    @GetUser() user: IUser,
     @Body(new ValidationPipe()) changePasswordDto: ChangePasswordDto,
   ): Promise<boolean> {
-    return this.authService.changePassword(user._id, changePasswordDto);
+    return this.authService.changePasswordByToken(changePasswordDto);
   }
 }

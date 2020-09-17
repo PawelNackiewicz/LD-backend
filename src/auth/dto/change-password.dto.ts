@@ -8,4 +8,5 @@ export class ChangePasswordDto {
         { message: 'Weak password' },
     )
     readonly password: string;
+    token: string;
 }
