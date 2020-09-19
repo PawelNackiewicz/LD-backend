@@ -14,6 +14,7 @@ export class UsersService {
       await createdUser.save();
     } catch (e) {
       console.error(e);
+      return null;
     }
   }
 
@@ -22,6 +23,7 @@ export class UsersService {
       return this.userModel.findOne({ email });
     } catch (e) {
       console.error(e);
+      return null;
     }
   }
 }

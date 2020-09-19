@@ -24,6 +24,7 @@ export class FacilityService {
       return this.facilityModel.find().exec();
     } catch (e) {
       console.error(e);
+      return null;
     }
   }
 
@@ -32,6 +33,7 @@ export class FacilityService {
       return this.facilityModel.findById(id);
     } catch (e) {
       console.error(e);
+      return null;
     }
   }
 
@@ -43,6 +45,7 @@ export class FacilityService {
       await this.facilityModel.findByIdAndUpdate(id, createFacilityDto);
     } catch (e) {
       console.error(e);
+      return null;
     }
   }
 
@@ -51,6 +54,7 @@ export class FacilityService {
       await this.facilityModel.findByIdAndDelete(id);
     } catch (e) {
       console.error(e);
+      return null
     }
   }
 }
