@@ -35,6 +35,7 @@ export class UserService {
       return await this.userModel.findOne({ email }).exec();
     } catch (e) {
       console.log(e);
+      return null;
     }
   }
 
