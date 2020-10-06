@@ -2,7 +2,7 @@ import { Body, Controller, Get, Patch, Post, Query, Request, ValidationPipe } fr
 import { AuthService } from './auth.service';
 import { CreateUserDto } from '../users/dto/create-user.dto';
 import { LoginDto } from './dto/login.dto';
-import { SetCookies } from '@nestjsplus/cookies/index';
+import { SetCookies, Cookies } from '@nestjsplus/cookies/index';
 import { CookieService } from '../cookie/cookie.service';
 import { IReadableUser } from '../users/interfaces/readable-user.interface';
 import { ConfirmAccountDto } from './dto/confirm-account.dto';
@@ -35,9 +35,8 @@ export class AuthController {
   }
 
   @Get('session/me')
-  async getProfile(@Request() req): Promise<IReadableUser> {
-    const token = req.headers.cookie;
-    return await this.authService.getUserInfo(token);
+  async getProfile(@Cookies() cookies): Promise<IReadableUser> {
+    return await this.authService.getUserInfo(cookies.token);
   }
 
   @Get('/confirm')
