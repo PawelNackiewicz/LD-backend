@@ -1,4 +1,6 @@
 import { Body, Controller, Get, Patch, Post, Query, Request, ValidationPipe } from '@nestjs/common';
+import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+
 import { AuthService } from './auth.service';
 import { CreateUserDto } from '../users/dto/create-user.dto';
 import { LoginDto } from './dto/login.dto';
@@ -9,6 +11,7 @@ import { ConfirmAccountDto } from './dto/confirm-account.dto';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
 
+@ApiTags('auth')
 @Controller('auth')
 export class AuthController {
   constructor(
@@ -17,6 +20,7 @@ export class AuthController {
   ) {}
 
   @Post('register')
+  @ApiOperation({ summary: 'Create user' })
   async registration(
     @Body(new ValidationPipe()) createUserDto: CreateUserDto,
   ): Promise<boolean> {
@@ -24,6 +28,9 @@ export class AuthController {
   }
 
   @Post('login')
+  @ApiResponse({ status: 404, description: 'Not found.' })
+  @ApiResponse({ status: 401, description: 'Unauthorized.'})
+  @ApiOperation({ summary: 'Sign in user' })
   @SetCookies()
   async login(
     @Request() req,
@@ -34,12 +41,16 @@ export class AuthController {
     this.cookieService.setCookie(req, accessToken);
   }
 
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Get details of logged user' })
+  @ApiResponse({ status: 403, description: 'Forbidden.' })
   @Get('session/me')
   async getProfile(@Cookies() cookies): Promise<IReadableUser> {
     return await this.authService.getUserInfo(cookies.token);
   }
 
   @Get('/confirm')
+  @ApiOperation({ summary: 'Confirm registration process' })
   async confirm(
     @Query(new ValidationPipe()) query: ConfirmAccountDto,
   ): Promise<boolean> {
@@ -48,6 +59,7 @@ export class AuthController {
   }
 
   @Post('/forgotPassword')
+  @ApiOperation({ summary: 'Send link with token to reset password of user' })
   async forgotPassword(
     @Body(new ValidationPipe()) forgotPasswordDto: ForgotPasswordDto,
   ): Promise<void> {
@@ -55,6 +67,7 @@ export class AuthController {
   }
 
   @Patch('/changePassword')
+  @ApiOperation({ summary: 'Change password of user' })
   async changePassword(
     @Body(new ValidationPipe()) changePasswordDto: ChangePasswordDto,
   ): Promise<boolean> {
