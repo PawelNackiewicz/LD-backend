@@ -48,7 +48,7 @@ $ npm run start:prod
 ```
 
 ## API
-
+http://localhost:7000/api/
 ```$xslt
 First you should register a user
 
