@@ -49,35 +49,6 @@ $ npm run start:prod
 
 ## API
 http://localhost:7000/api/
-```$xslt
-First you should register a user
-
-# http://localhost:7000/auth/register   - POST
-body:   {"email": "email@email.com", "password": "password"}
-
-Next login endpoint
-# http://localhost:7000/auth/login      - POST
-body the same
-
-API's avaliable without auth
-
-# http://localhost:7000/facility        - GET - get all facilities
-
-# http://localhost:7000/facility/:id     - GET - get facility by id if exist
-
-API's with auth
-
-# http://localhost:7000/auth/profile    - GET - get user details
-
-# http://localhost:7000/facility        - POST - add facility
-body: {"name": "Facility name", "phone": "123 123 123", "description": "best facility ever"}
-
-# http://localhost:7000/facility/:id        - PUT - update facility
-body: {"name": "Facility name", "phone": "123 123 123", "description": "best facility ever"}
-
-# http://localhost:7000/facility/:id        - DELETE - delete facility
-```
-
 ## Test
 
 ```bash
