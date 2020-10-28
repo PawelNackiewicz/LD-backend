@@ -7,9 +7,9 @@ import { createMock } from '@golevelup/nestjs-testing';
 
 import { roleEnum } from './enums/role.enums';
 
-const mockUser: (email?: string, id?: string, status?: string, lastName?: string, firstName?: string, roles?: roleEnum[], password?: string, marketingPermissions?: boolean) => { firstName: string; lastName: string; password: string; roles: roleEnum[]; id: string; email: string; status: string; marketingPermissions: boolean } = (
+const mockUser: (email?: string, _id?: string, status?: string, lastName?: string, firstName?: string, roles?: roleEnum[], password?: string, marketingPermissions?: boolean) => { firstName: string; lastName: string; password: string; roles: roleEnum[]; _id: string; email: string; status: string; marketingPermissions: boolean } = (
   email = 'test@gmail.com',
-  id = 'abc123',
+  _id = 'abc123',
   status = 'active',
   lastName = 'wel',
   firstName = 'Pa',
@@ -19,7 +19,7 @@ const mockUser: (email?: string, id?: string, status?: string, lastName?: string
 ) => {
   return {
     email,
-    id,
+    _id,
     status,
     password,
     firstName,
@@ -74,7 +74,7 @@ describe('UserService', () => {
             new: jest.fn().mockResolvedValue(mockUser()),
             constructor: jest.fn().mockResolvedValue(mockUser()),
             find: jest.fn(),
-            findById: jest.fn(),
+            findById: jest.fn().mockReturnThis(),
             findOne: jest.fn(),
             update: jest.fn(),
             create: jest.fn(),
@@ -96,7 +96,7 @@ describe('UserService', () => {
   describe('findOne', () => {
     describe('when user with ID exist', () => {
       it('should return the user object', async () => {
-        jest.spyOn(userModel, 'findOne').mockReturnValueOnce(
+        jest.spyOn(userModel, 'findById').mockReturnValueOnce(
           createMock<DocumentQuery<IUser, IUser, unknown>>({
             exec: jest
               .fn()
