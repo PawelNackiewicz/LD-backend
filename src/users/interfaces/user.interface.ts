@@ -1,6 +1,6 @@
 import { Document } from 'mongoose';
 
-export interface IUser extends Document {
+export interface UserProps {
   readonly email: string;
   status: string;
   readonly lastName: string;
@@ -9,3 +9,5 @@ export interface IUser extends Document {
   readonly password: string;
   readonly marketingPermissions: boolean;
 }
+
+export type IUser = UserProps & Document
