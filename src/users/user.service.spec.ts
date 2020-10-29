@@ -21,17 +21,6 @@ const mockUser: MockedUser = {
   marketingPermissions: true,
 };
 
-const mockUserDTO: MockedUser = {
-  email: 'test@gmail.com',
-  _id: 'abc123',
-  status: statusEnum.active,
-  lastName: 'lastName',
-  firstName: 'firstName',
-  roles: [roleEnum.user],
-  password: 'pass123#',
-  marketingPermissions: true,
-};
-
 describe('UserService', () => {
   let service: UserService;
   let userModel: Model<IUser>;
@@ -62,7 +51,7 @@ describe('UserService', () => {
           createMock<DocumentQuery<IUser, IUser, unknown>>({
             exec: jest
               .fn()
-              .mockResolvedValueOnce(mockUserDTO),
+              .mockResolvedValueOnce(mockUser),
           }),
         );
         const findMockUser = mockUser;
