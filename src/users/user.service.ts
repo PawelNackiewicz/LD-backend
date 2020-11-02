@@ -17,13 +17,13 @@ export class UserService {
 
   async create(createUserDto: CreateUserDto, roles: string[]): Promise<IUser> {
     const hash = await this.hashPassword(createUserDto.password);
-    const createdUser = new this.userModel({
+    const createdUser = {
       ...createUserDto,
       password: hash,
       roles,
-    });
-    await createdUser.save();
-    return createdUser;
+    };
+    await this.userModel.create(createdUser as IUser);
+    return createdUser as IUser;
   }
 
   async find(id: string): Promise<IUser> {

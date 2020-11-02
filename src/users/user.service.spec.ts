@@ -31,7 +31,7 @@ describe('UserService', () => {
         UserService,
         {
           provide: getModelToken('User'),
-          useValue: createMock<Model<IUser>>()
+          useValue: createMock<Model<IUser>>(),
         },
       ],
     }).compile();
@@ -44,20 +44,54 @@ describe('UserService', () => {
     expect(service).toBeDefined();
   });
 
-  describe('findOne', () => {
-    describe('when user with ID exist', () => {
-      it('should return the user object', async () => {
-        jest.spyOn(userModel, 'findById').mockReturnValueOnce(
-          createMock<DocumentQuery<IUser, IUser, unknown>>({
-            exec: jest
-              .fn()
-              .mockResolvedValueOnce(mockUser),
-          }),
-        );
-        const findMockUser = mockUser;
-        const foundUser = await service.find('abc123');
-        expect(foundUser).toEqual(findMockUser);
-      });
-    });
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('should return the user object', async () => {
+    jest.spyOn(userModel, 'findById').mockReturnValueOnce(
+      createMock<DocumentQuery<IUser, IUser, unknown>>({
+        exec: jest
+          .fn()
+          .mockResolvedValueOnce(mockUser),
+      }),
+    );
+    const findMockUser = mockUser;
+    const foundUser = await service.find('abc123');
+    expect(foundUser).toEqual(findMockUser);
+  });
+
+  it('should getOne by email', async () => {
+    jest.spyOn(userModel, 'findOne').mockReturnValueOnce(
+      createMock<DocumentQuery<IUser, IUser, unknown>>({
+        exec: jest
+          .fn()
+          .mockResolvedValueOnce(mockUser),
+      }),
+    );
+    const findMockUser = mockUser;
+    const foundUser = await service.findByEmail(mockUser.email);
+    expect(foundUser).toEqual(findMockUser);
+  });
+
+  it('should insert a user', async () => {
+    jest.spyOn(userModel, 'create').mockResolvedValueOnce({
+        roles: [roleEnum.user],
+        status: statusEnum.pending,
+        marketingPermissions: true,
+        _id: 'abc123',
+        firstName: 'firstName',
+        lastName: 'lastName',
+        email: 'test@gmail.com',
+        password: 'pass123#'
+      } as any
+    );
+    const newUser = await service.create({
+      firstName: 'firstName',
+      lastName: 'lastName',
+      email: 'test@gmail.com',
+      password: 'pass123#',
+    }, [roleEnum.user]);
+    expect(newUser).toEqual(mockUser);
   });
 });
