@@ -11,14 +11,18 @@ import { CreateUserDto } from './dto/create-user.dto';
 
 type MockedUser = { _id: string } & UserProps
 
-const mockUser: MockedUser = {
+const mockUserDto: CreateUserDto = {
+  firstName: 'firstName',
+  lastName: 'lastName',
   email: 'test@gmail.com',
+  password: 'pass123#',
+}
+
+const mockUser: MockedUser = {
+  ...mockUserDto,
   _id: 'abc123',
   status: statusEnum.pending,
-  lastName: 'lastName',
-  firstName: 'firstName',
   roles: [roleEnum.user],
-  password: 'pass123#',
   marketingPermissions: true,
 };
 
@@ -27,13 +31,6 @@ const mockUpdatedUser: MockedUser = {
   status: statusEnum.active,
   firstName: 'Pawi',
 };
-
-const mockUserDto: CreateUserDto = {
-  firstName: 'firstName',
-  lastName: 'lastName',
-  email: 'test@gmail.com',
-  password: 'pass123#',
-}
 
 describe('UserService', () => {
   let service: UserService;
