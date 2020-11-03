@@ -21,6 +21,17 @@ const mockUser: MockedUser = {
   marketingPermissions: true,
 };
 
+const mockUpdatedUser: MockedUser = {
+  email: 'test@gmail.com',
+  _id: 'abc123',
+  status: statusEnum.active,
+  lastName: 'lastName',
+  firstName: 'Pawi',
+  roles: [roleEnum.user],
+  password: 'pass123#',
+  marketingPermissions: true,
+};
+
 describe('UserService', () => {
   let service: UserService;
   let userModel: Model<IUser>;
@@ -84,7 +95,7 @@ describe('UserService', () => {
         password: 'pass123#',
         marketingPermissions: true,
         status: statusEnum.pending
-      } as any
+      } as IUser
     );
     const newUser = await service.create({
       firstName: 'firstName',
@@ -93,5 +104,20 @@ describe('UserService', () => {
       password: 'pass123#',
     }, [roleEnum.user]);
     expect(newUser).toEqual(mockUser);
+  });
+
+  it('should update a user successfully', async () => {
+    jest.spyOn(userModel, 'updateOne').mockResolvedValueOnce({
+      _id: 'abc123',
+      roles: [roleEnum.user],
+      firstName: 'Pawi',
+      lastName: 'lastName',
+      email: 'test@gmail.com',
+      password: 'pass123#',
+      marketingPermissions: true,
+      status: statusEnum.active
+    });
+    const updatedUser = await service.update('abc123', {firstName: 'Pawi', status: statusEnum.active });
+    expect(updatedUser).toEqual(mockUpdatedUser);
   });
 });
