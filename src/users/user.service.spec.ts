@@ -7,6 +7,7 @@ import { createMock } from '@golevelup/nestjs-testing';
 
 import { roleEnum } from './enums/role.enums';
 import { statusEnum } from './enums/status.enums';
+import { CreateUserDto } from './dto/create-user.dto';
 
 type MockedUser = { _id: string } & UserProps
 
@@ -22,15 +23,17 @@ const mockUser: MockedUser = {
 };
 
 const mockUpdatedUser: MockedUser = {
-  email: 'test@gmail.com',
-  _id: 'abc123',
+  ...mockUser,
   status: statusEnum.active,
-  lastName: 'lastName',
   firstName: 'Pawi',
-  roles: [roleEnum.user],
-  password: 'pass123#',
-  marketingPermissions: true,
 };
+
+const mockUserDto: CreateUserDto = {
+  firstName: 'firstName',
+  lastName: 'lastName',
+  email: 'test@gmail.com',
+  password: 'pass123#',
+}
 
 describe('UserService', () => {
   let service: UserService;
@@ -67,9 +70,8 @@ describe('UserService', () => {
           .mockResolvedValueOnce(mockUser),
       }),
     );
-    const findMockUser = mockUser;
-    const foundUser = await service.find('abc123');
-    expect(foundUser).toEqual(findMockUser);
+    const foundUser = await service.find(mockUser._id);
+    expect(foundUser).toEqual(mockUser);
   });
 
   it('should return the user object by email', async () => {
@@ -80,44 +82,19 @@ describe('UserService', () => {
           .mockResolvedValueOnce(mockUser),
       }),
     );
-    const findMockUser = mockUser;
     const foundUser = await service.findByEmail(mockUser.email);
-    expect(foundUser).toEqual(findMockUser);
+    expect(foundUser).toEqual(mockUser);
   });
 
   it('should insert a new user', async () => {
-    jest.spyOn(userModel, 'create').mockResolvedValueOnce({
-        _id: 'abc123',
-        roles: [roleEnum.user],
-        firstName: 'firstName',
-        lastName: 'lastName',
-        email: 'test@gmail.com',
-        password: 'pass123#',
-        marketingPermissions: true,
-        status: statusEnum.pending
-      } as IUser
-    );
-    const newUser = await service.create({
-      firstName: 'firstName',
-      lastName: 'lastName',
-      email: 'test@gmail.com',
-      password: 'pass123#',
-    }, [roleEnum.user]);
+    jest.spyOn(userModel, 'create').mockResolvedValueOnce(mockUser as IUser);
+    const newUser = await service.create(mockUserDto, [roleEnum.user]);
     expect(newUser).toEqual(mockUser);
   });
 
   it('should update a user successfully', async () => {
-    jest.spyOn(userModel, 'updateOne').mockResolvedValueOnce({
-      _id: 'abc123',
-      roles: [roleEnum.user],
-      firstName: 'Pawi',
-      lastName: 'lastName',
-      email: 'test@gmail.com',
-      password: 'pass123#',
-      marketingPermissions: true,
-      status: statusEnum.active
-    });
-    const updatedUser = await service.update('abc123', {firstName: 'Pawi', status: statusEnum.active });
+    jest.spyOn(userModel, 'updateOne').mockResolvedValueOnce(mockUpdatedUser);
+    const updatedUser = await service.update(mockUpdatedUser._id, {firstName: mockUpdatedUser.firstName, status: mockUpdatedUser.status });
     expect(updatedUser).toEqual(mockUpdatedUser);
   });
 });
