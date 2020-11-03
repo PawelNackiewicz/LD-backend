@@ -13,7 +13,7 @@ type MockedUser = { _id: string } & UserProps
 const mockUser: MockedUser = {
   email: 'test@gmail.com',
   _id: 'abc123',
-  status: statusEnum.active,
+  status: statusEnum.pending,
   lastName: 'lastName',
   firstName: 'firstName',
   roles: [roleEnum.user],
@@ -48,7 +48,7 @@ describe('UserService', () => {
     jest.clearAllMocks();
   });
 
-  it('should return the user object', async () => {
+  it('should return the user object by ID', async () => {
     jest.spyOn(userModel, 'findById').mockReturnValueOnce(
       createMock<DocumentQuery<IUser, IUser, unknown>>({
         exec: jest
@@ -61,7 +61,7 @@ describe('UserService', () => {
     expect(foundUser).toEqual(findMockUser);
   });
 
-  it('should getOne by email', async () => {
+  it('should return the user object by email', async () => {
     jest.spyOn(userModel, 'findOne').mockReturnValueOnce(
       createMock<DocumentQuery<IUser, IUser, unknown>>({
         exec: jest
@@ -74,16 +74,16 @@ describe('UserService', () => {
     expect(foundUser).toEqual(findMockUser);
   });
 
-  it('should insert a user', async () => {
+  it('should insert a new user', async () => {
     jest.spyOn(userModel, 'create').mockResolvedValueOnce({
-        roles: [roleEnum.user],
-        status: statusEnum.pending,
-        marketingPermissions: true,
         _id: 'abc123',
+        roles: [roleEnum.user],
         firstName: 'firstName',
         lastName: 'lastName',
         email: 'test@gmail.com',
-        password: 'pass123#'
+        password: 'pass123#',
+        marketingPermissions: true,
+        status: statusEnum.pending
       } as any
     );
     const newUser = await service.create({

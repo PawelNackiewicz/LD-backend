@@ -5,6 +5,7 @@ import { Model } from 'mongoose';
 
 import * as bcrypt from 'bcrypt';
 import { IUser } from './interfaces/user.interface';
+import { statusEnum } from './enums/status.enums';
 
 @Injectable()
 export class UserService {
@@ -21,9 +22,10 @@ export class UserService {
       ...createUserDto,
       password: hash,
       roles,
+      marketingPermissions: true,
+      status: statusEnum.pending
     };
-    await this.userModel.create(createdUser as IUser);
-    return createdUser as IUser;
+    return await this.userModel.create(createdUser as IUser);
   }
 
   async find(id: string): Promise<IUser> {
