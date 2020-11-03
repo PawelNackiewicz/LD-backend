@@ -20,7 +20,7 @@ const mockUserDto: CreateUserDto = {
 
 const mockUser: MockedUser = {
   ...mockUserDto,
-  password: mockUserDto.password.concat('###'),
+  password: 'pass123#_###',
   _id: 'abc123',
   status: statusEnum.pending,
   roles: [roleEnum.user],
@@ -86,7 +86,7 @@ describe('UserService', () => {
 
   it('should insert a new user', async () => {
     jest.spyOn(userModel, 'create').mockResolvedValueOnce(mockUser as IUser);
-    jest.spyOn(service, 'hashPassword').mockResolvedValueOnce(mockUserDto.password.concat('###'));
+    jest.spyOn(service, 'hashPassword').mockImplementation((password: string) => Promise.resolve(password.concat('_###')))
     const newUser = await service.create(mockUserDto, [roleEnum.user]);
     expect(newUser).toEqual(mockUser);
   });
