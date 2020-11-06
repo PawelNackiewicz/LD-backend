@@ -8,6 +8,7 @@ import * as crypto from 'crypto';
 import { IUser } from '../users/interfaces/user.interface';
 import { statusEnum } from '../users/enums/status.enums';
 import * as moment from 'moment';
+import mongoose from "mongoose";
 
 @Injectable()
 export class TokenService {
@@ -68,8 +69,7 @@ export class TokenService {
   }
 
   async create(createUserTokenDto: CreateUserTokenDto): Promise<IUserToken> {
-    const userToken = new this.tokenModel(createUserTokenDto);
-    return await userToken.save();
+    return await this.tokenModel.create(createUserTokenDto);
   }
 
   async delete(
@@ -87,7 +87,7 @@ export class TokenService {
     return await this.tokenModel.exists({ userId, token });
   }
 
-  async getUserId(token: string): Promise<string> {
+  async getUserId(token: string): Promise<mongoose.Types.ObjectId> {
     return await this.tokenModel
       .findOne({ token })
       .exec()
