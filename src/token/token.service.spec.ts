@@ -24,7 +24,6 @@ const mockToken: MokedToken = {
 
 describe('ToeknService', () => {
   let service: TokenService;
-  // let tokenModel: Model<IUserToken>
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -38,7 +37,6 @@ describe('ToeknService', () => {
     }).compile()
 
     service = module.get<TokenService>(TokenService);
-    // tokenModel = module.get<Model<IUserToken>>(getModelToken('Token'))
   })
 
   it('should be defined', () => {
@@ -49,9 +47,19 @@ describe('ToeknService', () => {
     jest.clearAllMocks();
   });
 
-  it('sholud create a token', async () => {
+  it('should create a token', async () => {
     jest.spyOn(service, 'create').mockResolvedValueOnce(mockToken as IUserToken);
     const newToken = await service.create(mockTokenDto);
     expect(mockToken).toEqual(newToken)
-  })
+  });
+
+  it('should delete a token', async () => {
+    jest.spyOn(service, 'delete').mockResolvedValueOnce(true);
+    expect(await service.delete(mockTokenDto.userId.toHexString(), mockTokenDto.token)).toEqual(true);
+  });
+
+  it('should delete all user tokens', async () => {
+    jest.spyOn(service, 'deleteAll').mockResolvedValueOnce(true);
+    expect(await service.deleteAll(mockTokenDto.userId.toHexString())).toEqual(true);
+  });
 })

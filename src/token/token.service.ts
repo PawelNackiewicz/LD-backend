@@ -1,6 +1,6 @@
 import { ForbiddenException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import mongoose, { Model } from 'mongoose';
 import { IUserToken } from './interfaces/user-token.interface';
 import { CreateUserTokenDto } from './dto/create-user-token.dto';
 import { JWE, JWK, JWT } from 'jose';
@@ -8,7 +8,6 @@ import * as crypto from 'crypto';
 import { IUser } from '../users/interfaces/user.interface';
 import { statusEnum } from '../users/enums/status.enums';
 import * as moment from 'moment';
-import mongoose from "mongoose";
 
 @Injectable()
 export class TokenService {
@@ -22,7 +21,8 @@ export class TokenService {
 
   constructor(
     @InjectModel('Token') private readonly tokenModel: Model<IUserToken>,
-  ) {}
+  ) {
+  }
 
   async getActivationToken(userEmail: string): Promise<string> {
     return JWE.encrypt(
@@ -75,12 +75,22 @@ export class TokenService {
   async delete(
     userId: string,
     token: string,
-  ): Promise<{ ok?: number; n?: number }> {
-    return this.tokenModel.deleteOne({ userId, token });
+  ): Promise<boolean> {
+    try {
+      await this.tokenModel.deleteOne({ userId, token });
+      return true;
+    } catch (e) {
+      return false;
+    }
   }
 
-  async deleteAll(userId: string): Promise<{ ok?: number; n?: number }> {
-    return this.tokenModel.deleteMany({ userId });
+  async deleteAll(userId: string): Promise<boolean> {
+    try {
+      await this.tokenModel.deleteMany({ userId });
+      return true;
+    } catch (e) {
+      return false;
+    }
   }
 
   async exists(userId: string, token: string): Promise<boolean> {
