@@ -120,7 +120,7 @@ export class AuthService {
     const userId = await this.tokenService.getUserId(
       AuthService.parseToken(token),
     );
-    return await this.userService.find(userId);
+    return await this.userService.find(userId.toHexString());
   }
 
   private static parseToken(token: string): string {
