@@ -29,9 +29,6 @@ export class AuthService {
   }
 
   async login({ email, password }: LoginDto): Promise<string> {
-    //2. check if is cookie to authentication
-
-    //3. check if user with this login and hash password exist
     const user = await this.userService.findByEmail(email);
 
     if (user && (await bcrypt.compare(password, user.password))) {

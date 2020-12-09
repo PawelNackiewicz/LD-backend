@@ -36,7 +36,6 @@ export class AuthController {
     @Request() req,
     @Body(new ValidationPipe()) loginDto: LoginDto,
   ): Promise<void> {
-    // 6. 7. set cookies
     const accessToken = await this.authService.login(loginDto);
     this.cookieService.setCookie(req, accessToken);
   }

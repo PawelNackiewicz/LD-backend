@@ -1,25 +1,27 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Facility } from './models/facility.schema';
 import { Model } from 'mongoose';
-import { CreateFacilityDto } from './models/create-facility.dto';
+import { CreateFacilityDto } from './dto/create-facility.dto';
+import { IFacility } from './interfaces/facility.interface';
 
 @Injectable()
 export class FacilityService {
   constructor(
-    @InjectModel(Facility.name) private facilityModel: Model<Facility>,
+    @InjectModel('Facility') private readonly facilityModel: Model<IFacility>,
   ) {}
 
-  async create(createFacilityDto: CreateFacilityDto): Promise<void> {
+  async create(createFacilityDto: CreateFacilityDto): Promise<boolean> {
     try {
       const createdFacility = new this.facilityModel(createFacilityDto);
       await createdFacility.save();
+      return true;
     } catch (e) {
       console.error(e);
+      return false;
     }
   }
 
-  async findAll(): Promise<Facility[]> {
+  async findAll(): Promise<IFacility[]> {
     try {
       return this.facilityModel.find().exec();
     } catch (e) {
@@ -28,7 +30,7 @@ export class FacilityService {
     }
   }
 
-  async find(id: number): Promise<Facility> {
+  async find(id: number): Promise<IFacility> {
     try {
       return this.facilityModel.findById(id);
     } catch (e) {
@@ -54,7 +56,7 @@ export class FacilityService {
       await this.facilityModel.findByIdAndDelete(id);
     } catch (e) {
       console.error(e);
-      return null
+      return null;
     }
   }
 }

@@ -41,13 +41,11 @@ export class TokenService {
     if (withStatusCheck && user.status !== statusEnum.active) {
       throw new UnauthorizedException();
     }
-    // 4. generate token
     const token = await TokenService.generateToken();
     const expireAt = moment()
       .add(1, 'day')
       .toISOString();
 
-    // 5. save token with user and expired time in database
     await this.create({
       token,
       expireAt,

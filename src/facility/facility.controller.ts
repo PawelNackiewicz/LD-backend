@@ -1,9 +1,18 @@
-import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Put,
+  ValidationPipe,
+} from '@nestjs/common';
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 import { FacilityService } from './facility.service';
-import { CreateFacilityDto } from './models/create-facility.dto';
-import { Facility } from './models/facility.schema';
+import { CreateFacilityDto } from './dto/create-facility.dto';
+import { IFacility } from './interfaces/facility.interface';
 
 @ApiTags('facility')
 @Controller('facility')
@@ -11,18 +20,22 @@ export class FacilityController {
   constructor(private readonly facilityService: FacilityService) {}
 
   @Get()
-  async findAll(): Promise<Facility[]> {
+  async findAll(): Promise<IFacility[]> {
     return this.facilityService.findAll();
   }
 
   @Get(':id')
-  async find(@Param('id') id: number): Promise<Facility> {
+  async find(@Param('id') id: number): Promise<IFacility> {
     return this.facilityService.find(id);
   }
 
   @Post()
-  async create(@Body() createFacilityDto: CreateFacilityDto) {
-    await this.facilityService.create(createFacilityDto);
+  @ApiResponse({ status: 400, description: 'Bad Request' })
+  @ApiOperation({ summary: 'Create facility' })
+  async create(
+    @Body(new ValidationPipe()) createFacilityDto: CreateFacilityDto,
+  ): Promise<boolean> {
+    return await this.facilityService.create(createFacilityDto);
   }
 
   @Put(':id')
