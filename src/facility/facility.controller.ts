@@ -36,23 +36,26 @@ export class FacilityController {
 
   @Get(':id')
   @ApiOperation({ summary: 'Get facility by id' })
-  async find(@Param('id') id: number): Promise<IFacility> {
+  async find(@Param('id') id: string): Promise<IFacility> {
     return this.facilityService.find(id);
   }
 
   @Post()
   @UseGuards(AuthGuard)
   @ApiResponse({ status: 400, description: 'Bad Request' })
+  @ApiResponse({ status: 403, description: 'Forbidden' })
   @ApiOperation({ summary: 'Create facility' })
   async create(
     @Body(new ValidationPipe()) createFacilityDto: CreateFacilityDto,
-  ): Promise<boolean> {
+  ): Promise<void> {
     return await this.facilityService.create(createFacilityDto);
   }
 
   @Put(':id')
   @UseGuards(AuthGuard)
   @ApiResponse({ status: 400, description: 'Validation error, bad request' })
+  @ApiResponse({ status: 403, description: 'Forbidden' })
+  @ApiResponse({ status: 404, description: 'Not found' })
   @ApiResponse({ status: 200, description: 'Ok' })
   @ApiOperation({ summary: 'Update facility' })
   async update(
@@ -60,8 +63,8 @@ export class FacilityController {
     @Body() createFacilityDto: Partial<CreateFacilityDto>,
     @Cookies() cookies,
   ) {
-    console.log(cookies.token);
-    return this.facilityService.update(id, createFacilityDto, cookies.token)
+    return this.facilityService
+      .update(id, createFacilityDto, cookies.token)
   }
 
   @Delete(':id')

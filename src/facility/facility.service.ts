@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { CreateFacilityDto } from './dto/create-facility.dto';
@@ -13,14 +13,12 @@ export class FacilityService {
     private readonly authService: AuthService,
   ) {}
 
-  async create(createFacilityDto: CreateFacilityDto): Promise<boolean> {
+  async create(createFacilityDto: CreateFacilityDto): Promise<void> {
     try {
       const createdFacility = new this.facilityModel(createFacilityDto);
       await createdFacility.save();
-      return true;
     } catch (e) {
       console.error(e);
-      return false;
     }
   }
 
@@ -42,7 +40,7 @@ export class FacilityService {
     }
   }
 
-  async find(id: number): Promise<IFacility> {
+  async find(id: string): Promise<IFacility> {
     try {
       return this.facilityModel.findById(id);
     } catch (e) {
@@ -56,28 +54,29 @@ export class FacilityService {
     createFacilityDto: Partial<CreateFacilityDto>,
     token: string,
   ): Promise<void> {
-    try {
-      const { roles, _id } = await this.authService.getUserInfo(token);
-      const facilityToEdit = await this.facilityModel.findById(id);
-      if (roles.includes(roleEnum.admin) || String(_id) === facilityToEdit.userId) {
-        await this.facilityModel.findByIdAndUpdate(id, createFacilityDto);
-      }
-    } catch (e) {
-      console.error(e);
-      throw new UnauthorizedException();
+    const { roles, _id } = await this.authService.getUserInfo(token);
+    const facilityToEdit = await this.facilityModel.findById(id);
+    if (!facilityToEdit)
+      throw new HttpException('Facility not found', HttpStatus.NOT_FOUND);
+
+    if (
+      roles.includes(roleEnum.admin) ||
+      String(_id) === facilityToEdit.userId
+    ) {
+      await this.facilityModel.findByIdAndUpdate(id, createFacilityDto);
     }
   }
 
   async delete(id: number, token: string): Promise<void> {
-    try {
       const { roles, _id } = await this.authService.getUserInfo(token);
       const facilityToDelete = await this.facilityModel.findById(id);
-      if (roles.includes(roleEnum.admin) || String(_id) === facilityToDelete.userId) {
+      if (!facilityToDelete)
+        throw new HttpException('Facility not found', HttpStatus.NOT_FOUND);
+      if (
+        roles.includes(roleEnum.admin) ||
+        String(_id) === facilityToDelete.userId
+      ) {
         await this.facilityModel.findByIdAndDelete(id);
       }
-    } catch (e) {
-      console.error(e);
-      return null;
-    }
   }
 }
