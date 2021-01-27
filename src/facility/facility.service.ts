@@ -1,4 +1,7 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { CreateFacilityDto } from './dto/create-facility.dto';
@@ -57,8 +60,7 @@ export class FacilityService {
   ): Promise<void> {
     const { roles, _id } = await this.authService.getUserInfo(token);
     const facilityToEdit = await this.facilityModel.findById(id);
-    if (!facilityToEdit)
-      throw new HttpException('Facility not found', HttpStatus.NOT_FOUND);
+    if (!facilityToEdit) throw new NotFoundException('Facility not found');
 
     if (
       roles.includes(roleEnum.admin) ||
@@ -80,7 +82,7 @@ export class FacilityService {
     const { roles, _id } = await this.authService.getUserInfo(token);
     const facilityToDelete = await this.facilityModel.findById(id);
     if (!facilityToDelete)
-      throw new HttpException('Facility not found', HttpStatus.NOT_FOUND);
+      throw new NotFoundException('Facility not found');
     if (
       roles.includes(roleEnum.admin) ||
       String(_id) === facilityToDelete.userId
