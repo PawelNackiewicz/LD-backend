@@ -15,7 +15,7 @@ import { FacilityService } from './facility.service';
 import { CreateFacilityDto } from './dto/create-facility.dto';
 import { IFacility } from './interfaces/facility.interface';
 import { Cookies } from '@nestjsplus/cookies/index';
-import { AuthGuard } from '../auth/auth.quard';
+import { AuthGuard } from '../auth/auth.guard';
 
 @ApiTags('facility')
 @Controller('facility')
@@ -63,8 +63,7 @@ export class FacilityController {
     @Body() createFacilityDto: Partial<CreateFacilityDto>,
     @Cookies() cookies,
   ) {
-    return this.facilityService
-      .update(id, createFacilityDto, cookies.token)
+    return this.facilityService.update(id, createFacilityDto, cookies.token);
   }
 
   @Delete(':id')

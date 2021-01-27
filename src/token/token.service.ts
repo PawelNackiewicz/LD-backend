@@ -11,7 +11,7 @@ import { CreateUserTokenDto } from './dto/create-user-token.dto';
 import { JWE, JWK, JWT } from 'jose';
 import * as crypto from 'crypto';
 import { IUser } from '../users/interfaces/user.interface';
-import { statusEnum } from '../users/enums/status.enums';
+import { statusEnum } from '../users/enums/status';
 import * as moment from 'moment';
 
 @Injectable()
@@ -121,8 +121,9 @@ export class TokenService {
       .exec()
       .then(token => {
         return this.tokenActive(token.expireAt);
-      }).catch(() => {
-        throw new ForbiddenException()
+      })
+      .catch(() => {
+        throw new ForbiddenException();
       });
   }
 }

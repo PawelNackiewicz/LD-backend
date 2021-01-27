@@ -5,18 +5,18 @@ import { DocumentQuery, Model } from 'mongoose';
 import { IUser, UserProps } from './interfaces/user.interface';
 import { createMock } from '@golevelup/nestjs-testing';
 
-import { roleEnum } from './enums/role.enums';
-import { statusEnum } from './enums/status.enums';
+import { roleEnum } from './enums/role';
+import { statusEnum } from './enums/status';
 import { CreateUserDto } from './dto/create-user.dto';
 
-type MockedUser = { _id: string } & UserProps
+type MockedUser = { _id: string } & UserProps;
 
 const mockUserDto: CreateUserDto = {
   firstName: 'firstName',
   lastName: 'lastName',
   email: 'test@gmail.com',
   password: 'pass123#',
-}
+};
 
 const mockUser: MockedUser = {
   ...mockUserDto,
@@ -63,9 +63,7 @@ describe('UserService', () => {
   it('should return the user object by ID', async () => {
     jest.spyOn(userModel, 'findById').mockReturnValueOnce(
       createMock<DocumentQuery<IUser, IUser, unknown>>({
-        exec: jest
-          .fn()
-          .mockResolvedValueOnce(mockUser),
+        exec: jest.fn().mockResolvedValueOnce(mockUser),
       }),
     );
     const foundUser = await service.find(mockUser._id);
@@ -75,9 +73,7 @@ describe('UserService', () => {
   it('should return the user object by email', async () => {
     jest.spyOn(userModel, 'findOne').mockReturnValueOnce(
       createMock<DocumentQuery<IUser, IUser, unknown>>({
-        exec: jest
-          .fn()
-          .mockResolvedValueOnce(mockUser),
+        exec: jest.fn().mockResolvedValueOnce(mockUser),
       }),
     );
     const foundUser = await service.findByEmail(mockUser.email);
@@ -86,14 +82,21 @@ describe('UserService', () => {
 
   it('should insert a new user', async () => {
     jest.spyOn(userModel, 'create').mockResolvedValueOnce(mockUser as IUser);
-    jest.spyOn(service, 'hashPassword').mockImplementation((password: string) => Promise.resolve(password.concat('_###')))
+    jest
+      .spyOn(service, 'hashPassword')
+      .mockImplementation((password: string) =>
+        Promise.resolve(password.concat('_###')),
+      );
     const newUser = await service.create(mockUserDto, [roleEnum.user]);
     expect(newUser).toEqual(mockUser);
   });
 
   it('should update a user successfully', async () => {
     jest.spyOn(userModel, 'updateOne').mockResolvedValueOnce(mockUpdatedUser);
-    const updatedUser = await service.update(mockUpdatedUser._id, {firstName: mockUpdatedUser.firstName, status: mockUpdatedUser.status });
+    const updatedUser = await service.update(mockUpdatedUser._id, {
+      firstName: mockUpdatedUser.firstName,
+      status: mockUpdatedUser.status,
+    });
     expect(updatedUser).toEqual(mockUpdatedUser);
   });
 });

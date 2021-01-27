@@ -1,9 +1,7 @@
 import { INestApplication } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 
-export function configure(
-  app: INestApplication,
-  ): void {
+export function configure(app: INestApplication): void {
   const options = new DocumentBuilder()
     .setTitle('Lokalne dobrodziejstwa')
     .setDescription('API descriptions')

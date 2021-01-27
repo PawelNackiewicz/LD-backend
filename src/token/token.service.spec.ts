@@ -5,7 +5,6 @@ import { IUserToken } from './interfaces/user-token.interface';
 import { getModelToken } from '@nestjs/mongoose';
 import { createMock } from '@golevelup/nestjs-testing';
 
-
 describe('ToeknService', () => {
   let service: TokenService;
 
@@ -15,13 +14,13 @@ describe('ToeknService', () => {
         TokenService,
         {
           provide: getModelToken('Token'),
-          useValue: createMock<Model<IUserToken>>()
-        }
-      ]
-    }).compile()
+          useValue: createMock<Model<IUserToken>>(),
+        },
+      ],
+    }).compile();
 
     service = module.get<TokenService>(TokenService);
-  })
+  });
 
   it('should be defined', () => {
     expect(service).toBeDefined();
@@ -30,4 +29,4 @@ describe('ToeknService', () => {
   afterEach(() => {
     jest.clearAllMocks();
   });
-})
+});

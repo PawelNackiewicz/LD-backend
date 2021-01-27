@@ -1,7 +1,7 @@
-import { roleEnum } from '../enums/role.enums';
+import { roleEnum } from '../enums/role';
 
 export interface IReadableUser {
-  readonly _id: string
+  readonly _id: string;
   readonly email: string;
   status: string;
   readonly lastName: string;

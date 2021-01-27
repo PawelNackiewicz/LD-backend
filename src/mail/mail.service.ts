@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import * as nodemailer from 'nodemailer';
 import { ConfigService } from '../config/config.service';
 import { SendMainInterface } from './interfaces/sendMain.interface';
+import { IUser } from '../users/interfaces/user.interface';
 
 @Injectable()
 export class MailService {
@@ -30,6 +31,28 @@ export class MailService {
         return console.log(`error: ${error}`);
       }
       console.log(`Message Sent ${info.response}`);
+    });
+  }
+
+  async sendConfirmationMail(user: IUser, confirmLink) {
+    await this.sendMail({
+      to: user.email,
+      subject: 'Potwierdzenie rejestracji',
+      content: `
+                <h3>Cześć, ${user.firstName}!</h3>
+                <p>Aby potwierdzić swoje konto i w pełni korzystać z serwisu, wejdź w  ten <a href="${confirmLink}">link</a>.</p>
+            `,
+    });
+  }
+
+  async sendForgotPasswordMail(user: IUser, forgotLink) {
+    await this.sendMail({
+      to: user.email,
+      subject: 'Przypomnienie hasła',
+      content: `
+                <h3>Cześć ${user.firstName}!</h3>
+                <p>Aby zresetować swoje hasło kliknij w <a href="${forgotLink}">link</a>.</p>
+               `,
     });
   }
 }

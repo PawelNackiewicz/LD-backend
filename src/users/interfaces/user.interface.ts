@@ -1,5 +1,5 @@
 import { Document } from 'mongoose';
-import { roleEnum } from '../enums/role.enums';
+import { roleEnum } from '../enums/role';
 
 export interface UserProps {
   readonly email: string;
@@ -11,4 +11,4 @@ export interface UserProps {
   readonly marketingPermissions: boolean;
 }
 
-export type IUser = UserProps & Document
+export type IUser = UserProps & Document;

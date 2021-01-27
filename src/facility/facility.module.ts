@@ -10,7 +10,7 @@ import { TokenModule } from '../token/token.module';
   imports: [
     MongooseModule.forFeature([{ name: 'Facility', schema: FacilitySchema }]),
     AuthModule,
-    TokenModule
+    TokenModule,
   ],
   controllers: [FacilityController],
   providers: [FacilityService],

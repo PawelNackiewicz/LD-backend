@@ -16,7 +16,7 @@ async function bootstrap() {
   });
   app.use(CookieParser('secret'));
   const configService = app.get<ConfigService>(ConfigService);
-  configure(app)
+  configure(app);
   await app.listen(configService.get('PORT'));
 }
 

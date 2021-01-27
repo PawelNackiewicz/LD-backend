@@ -4,7 +4,7 @@ import { Model } from 'mongoose';
 import { CreateFacilityDto } from './dto/create-facility.dto';
 import { IFacility } from './interfaces/facility.interface';
 import { AuthService } from '../auth/auth.service';
-import { roleEnum } from '../users/enums/role.enums';
+import { roleEnum } from '../users/enums/role';
 
 @Injectable()
 export class FacilityService {
@@ -15,6 +15,7 @@ export class FacilityService {
 
   async create(createFacilityDto: CreateFacilityDto): Promise<void> {
     try {
+      console.log(createFacilityDto);
       const createdFacility = new this.facilityModel(createFacilityDto);
       await createdFacility.save();
     } catch (e) {
@@ -63,20 +64,28 @@ export class FacilityService {
       roles.includes(roleEnum.admin) ||
       String(_id) === facilityToEdit.userId
     ) {
-      await this.facilityModel.findByIdAndUpdate(id, createFacilityDto);
+      console.log(createFacilityDto); //check if DTO is correct?
+      await this.facilityModel
+        .findByIdAndUpdate(id, createFacilityDto)
+        .then(() => {
+          console.log('pawi');
+        })
+        .catch(() => {
+          console.log('error');
+        });
     }
   }
 
   async delete(id: number, token: string): Promise<void> {
-      const { roles, _id } = await this.authService.getUserInfo(token);
-      const facilityToDelete = await this.facilityModel.findById(id);
-      if (!facilityToDelete)
-        throw new HttpException('Facility not found', HttpStatus.NOT_FOUND);
-      if (
-        roles.includes(roleEnum.admin) ||
-        String(_id) === facilityToDelete.userId
-      ) {
-        await this.facilityModel.findByIdAndDelete(id);
-      }
+    const { roles, _id } = await this.authService.getUserInfo(token);
+    const facilityToDelete = await this.facilityModel.findById(id);
+    if (!facilityToDelete)
+      throw new HttpException('Facility not found', HttpStatus.NOT_FOUND);
+    if (
+      roles.includes(roleEnum.admin) ||
+      String(_id) === facilityToDelete.userId
+    ) {
+      await this.facilityModel.findByIdAndDelete(id);
+    }
   }
 }
