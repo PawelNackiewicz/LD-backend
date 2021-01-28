@@ -1,8 +1,11 @@
+import { roleEnum } from '../enums/role';
+
 export interface IReadableUser {
+  readonly _id: string;
   readonly email: string;
   status: string;
   readonly lastName: string;
   readonly firstName: string;
-  readonly roles: Array<string>;
+  readonly roles: Array<roleEnum>;
   accessToken?: string;
 }

@@ -14,4 +14,4 @@ export interface FacilityProps {
   readonly latitude: number;
 }
 
-export type IFacility = FacilityProps & Document
+export type IFacility = FacilityProps & Document;

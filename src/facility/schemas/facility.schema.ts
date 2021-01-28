@@ -2,7 +2,7 @@ import * as mongoose from 'mongoose';
 
 export const FacilitySchema = new mongoose.Schema({
   name: { type: String, required: true },
-  userId: { type: String, required: true},
+  userId: { type: String, required: true },
   streetName: { type: String, required: false },
   houseNumber: { type: String, required: false },
   flatNumber: { type: String, required: false },

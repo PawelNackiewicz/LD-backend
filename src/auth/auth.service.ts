@@ -6,9 +6,9 @@ import { ConfigService } from '../config/config.service';
 import { TokenService } from '../token/token.service';
 import * as bcrypt from 'bcrypt';
 import { CreateUserDto } from '../users/dto/create-user.dto';
-import { roleEnum } from '../users/enums/role.enums';
+import { roleEnum } from '../users/enums/role';
 import { IReadableUser } from '../users/interfaces/readable-user.interface';
-import { statusEnum } from '../users/enums/status.enums';
+import { statusEnum } from '../users/enums/status';
 import { LoginDto } from './dto/login.dto';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { ConfirmAccountDto } from './dto/confirm-account.dto';
@@ -30,8 +30,10 @@ export class AuthService {
 
   async login({ email, password }: LoginDto): Promise<string> {
     const user = await this.userService.findByEmail(email);
+    const correctCredentials =
+      user && (await bcrypt.compare(password, user.password));
 
-    if (user && (await bcrypt.compare(password, user.password))) {
+    if (correctCredentials) {
       return await this.tokenService.signUser(user);
     }
     throw new NotFoundException('Invalid credentials');
@@ -39,21 +41,14 @@ export class AuthService {
 
   async register(createUserDto: CreateUserDto): Promise<boolean> {
     const user = await this.userService.create(createUserDto, [roleEnum.user]);
-    await this.sendConfirmation(user);
+    await this.prepareConfirmation(user);
     return true;
   }
 
-  async sendConfirmation(user: IUser) {
+  async prepareConfirmation(user: IUser) {
     const token = await this.tokenService.getActivationToken(user.email);
     const confirmLink = `${this.clientAppUrl}/auth/confirm?token=${token}`;
-    await this.mailService.sendMail({
-      to: user.email,
-      subject: 'Potwierdzenie rejestracji',
-      content: `
-                <h3>Cześć, ${user.firstName}!</h3>
-                <p>Aby potwierdzić swoje konto i w pełni korzystać z serwisu, wejdź w  ten <a href="${confirmLink}">link</a>.</p>
-            `,
-    });
+    await this.mailService.sendConfirmationMail(user, confirmLink);
   }
 
   async forgotPassword(forgotPasswordDto: ForgotPasswordDto): Promise<void> {
@@ -61,15 +56,7 @@ export class AuthService {
     if (!user) return;
     const token = await this.tokenService.getActivationToken(user.email);
     const forgotLink = `${this.clientAppUrl}/auth/resetPassword?token=${token}`;
-
-    await this.mailService.sendMail({
-      to: user.email,
-      subject: 'Forgot Password',
-      content: `
-                <h3>Cześć ${user.firstName}!</h3>
-                <p>Aby zresetować swoje hasło kliknij w <a href="${forgotLink}">link</a>.</p>
-            `,
-    });
+    await this.mailService.sendForgotPasswordMail(user, forgotLink);
   }
 
   async changePassword(

@@ -1,6 +1,6 @@
 import * as mongoose from 'mongoose';
-import { statusEnum } from '../enums/status.enums';
-import { roleEnum } from '../enums/role.enums';
+import { statusEnum } from '../enums/status';
+import { roleEnum } from '../enums/role';
 
 export const UserSchema = new mongoose.Schema({
   email: { type: String, required: true },

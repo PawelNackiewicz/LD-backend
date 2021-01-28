@@ -1,5 +1,19 @@
-import { Body, Controller, Get, Patch, Post, Query, Request, ValidationPipe } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  Body,
+  Controller,
+  Get,
+  Patch,
+  Post,
+  Query,
+  Request,
+  ValidationPipe,
+} from '@nestjs/common';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 
 import { AuthService } from './auth.service';
 import { CreateUserDto } from '../users/dto/create-user.dto';
@@ -29,7 +43,7 @@ export class AuthController {
 
   @Post('login')
   @ApiResponse({ status: 404, description: 'Not found.' })
-  @ApiResponse({ status: 401, description: 'Unauthorized.'})
+  @ApiResponse({ status: 401, description: 'Unauthorized.' })
   @ApiOperation({ summary: 'Sign in user' })
   @SetCookies()
   async login(
@@ -37,7 +51,7 @@ export class AuthController {
     @Body(new ValidationPipe()) loginDto: LoginDto,
   ): Promise<void> {
     const accessToken = await this.authService.login(loginDto);
-    this.cookieService.setCookie(req, accessToken);
+    this.cookieService.setTokenInCookies(req, accessToken);
   }
 
   @ApiBearerAuth()

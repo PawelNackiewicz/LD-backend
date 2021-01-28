@@ -1,4 +1,9 @@
-import { ForbiddenException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import mongoose, { Model } from 'mongoose';
 import { IUserToken } from './interfaces/user-token.interface';
@@ -6,7 +11,7 @@ import { CreateUserTokenDto } from './dto/create-user-token.dto';
 import { JWE, JWK, JWT } from 'jose';
 import * as crypto from 'crypto';
 import { IUser } from '../users/interfaces/user.interface';
-import { statusEnum } from '../users/enums/status.enums';
+import { statusEnum } from '../users/enums/status';
 import * as moment from 'moment';
 
 @Injectable()
@@ -21,8 +26,7 @@ export class TokenService {
 
   constructor(
     @InjectModel('Token') private readonly tokenModel: Model<IUserToken>,
-  ) {
-  }
+  ) {}
 
   async getActivationToken(userEmail: string): Promise<string> {
     return JWE.encrypt(
@@ -70,10 +74,7 @@ export class TokenService {
     return await this.tokenModel.create(createUserTokenDto);
   }
 
-  async delete(
-    userId: string,
-    token: string,
-  ): Promise<boolean> {
+  async delete(userId: string, token: string): Promise<boolean> {
     try {
       await this.tokenModel.deleteOne({ userId, token });
       return true;
@@ -112,5 +113,17 @@ export class TokenService {
 
   tokenActive(expireAt: string): boolean {
     return new Date(expireAt) > new Date(Date.now());
+  }
+
+  async tokenActiveByToken(token: string): Promise<boolean> {
+    return this.tokenModel
+      .findOne({ token })
+      .exec()
+      .then(token => {
+        return this.tokenActive(token.expireAt);
+      })
+      .catch(() => {
+        throw new ForbiddenException();
+      });
   }
 }
