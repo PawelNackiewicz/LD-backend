@@ -17,30 +17,30 @@ import { IFacility } from './interfaces/facility.interface';
 import { Cookies } from '@nestjsplus/cookies/index';
 import { AuthGuard } from '../auth/auth.guard';
 
-@ApiTags('facility')
-@Controller('facility')
+@ApiTags('facilities')
+@Controller()
 export class FacilityController {
   constructor(private readonly facilityService: FacilityService) {}
 
-  @Get('all')
+  @Get('facilities')
   @ApiOperation({ summary: 'Get all facilities' })
   async findAll(): Promise<IFacility[]> {
     return this.facilityService.findAll();
   }
 
-  @Get('all/:userId')
+  @Get('users/:userId/facilities')
   @ApiOperation({ summary: 'Get all facilities by userId' })
   async findAllByUser(@Param('userId') userId: string): Promise<IFacility[]> {
     return this.facilityService.findAllByUser(userId);
   }
 
-  @Get(':id')
+  @Get('facilities/:id')
   @ApiOperation({ summary: 'Get facility by id' })
   async find(@Param('id') id: string): Promise<IFacility> {
     return this.facilityService.find(id);
   }
 
-  @Post()
+  @Post('facilities')
   @UseGuards(AuthGuard)
   @ApiResponse({ status: 400, description: 'Bad Request' })
   @ApiResponse({ status: 403, description: 'Forbidden' })
@@ -51,7 +51,7 @@ export class FacilityController {
     return await this.facilityService.create(createFacilityDto);
   }
 
-  @Put(':id')
+  @Put('facilities/:id')
   @UseGuards(AuthGuard)
   @ApiResponse({ status: 400, description: 'Validation error, bad request' })
   @ApiResponse({ status: 403, description: 'Forbidden' })
@@ -66,7 +66,7 @@ export class FacilityController {
     return this.facilityService.update(id, createFacilityDto, cookies.token);
   }
 
-  @Delete(':id')
+  @Delete('facilities/:id')
   @UseGuards(AuthGuard)
   async delete(@Param('id') id: number, @Cookies() cookies) {
     return this.facilityService.delete(id, cookies.token).then();

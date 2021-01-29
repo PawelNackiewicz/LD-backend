@@ -33,7 +33,7 @@ export class AuthController {
     private readonly cookieService: CookieService,
   ) {}
 
-  @Post('register')
+  @Post('users')
   @ApiOperation({ summary: 'Create user' })
   async registration(
     @Body(new ValidationPipe()) createUserDto: CreateUserDto,
@@ -41,7 +41,7 @@ export class AuthController {
     return this.authService.register(createUserDto);
   }
 
-  @Post('login')
+  @Post('sessions')
   @ApiResponse({ status: 404, description: 'Not found.' })
   @ApiResponse({ status: 401, description: 'Unauthorized.' })
   @ApiOperation({ summary: 'Sign in user' })
@@ -57,7 +57,7 @@ export class AuthController {
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get details of logged user' })
   @ApiResponse({ status: 403, description: 'Forbidden.' })
-  @Get('session/me')
+  @Get('sessions/me')
   async getProfile(@Cookies() cookies): Promise<IReadableUser> {
     return await this.authService.getUserInfo(cookies.token);
   }
