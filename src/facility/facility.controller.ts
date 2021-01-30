@@ -47,7 +47,7 @@ export class FacilityController {
   @ApiOperation({ summary: 'Create facility' })
   async create(
     @Body(new ValidationPipe()) createFacilityDto: CreateFacilityDto,
-  ): Promise<void> {
+  ): Promise<IFacility> {
     return await this.facilityService.create(createFacilityDto);
   }
 
