@@ -8,20 +8,21 @@ import { createMock } from '@golevelup/nestjs-testing';
 import { roleEnum } from './enums/role';
 import { statusEnum } from './enums/status';
 import { CreateUserDto } from './dto/create-user.dto';
+import * as faker from 'faker';
 
 type MockedUser = { _id: string } & UserProps;
 
 const mockUserDto: CreateUserDto = {
-  firstName: 'firstName',
-  lastName: 'lastName',
-  email: 'test@gmail.com',
-  password: 'pass123#',
+  firstName: faker.name.firstName(),
+  lastName: faker.name.lastName(),
+  email:  faker.internet.email(),
+  password: faker.internet.password()
 };
 
 const mockUser: MockedUser = {
   ...mockUserDto,
-  password: 'pass123#_###',
-  _id: 'abc123',
+  password: faker.internet.password(),
+  _id: faker.random.uuid(),
   status: statusEnum.pending,
   roles: [roleEnum.user],
   marketingPermissions: true,
@@ -30,7 +31,7 @@ const mockUser: MockedUser = {
 const mockUpdatedUser: MockedUser = {
   ...mockUser,
   status: statusEnum.active,
-  firstName: 'Pawi',
+  firstName: faker.name.firstName(),
 };
 
 describe('UserService', () => {

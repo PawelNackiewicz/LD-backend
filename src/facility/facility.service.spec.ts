@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { FacilityService } from './facility.service';
-import { DocumentQuery, Model, Types} from 'mongoose';
+import { DocumentQuery, Model, Types } from 'mongoose';
 import { getModelToken } from '@nestjs/mongoose';
 import { createMock } from '@golevelup/nestjs-testing';
 import { FacilityProps, IFacility } from './interfaces/facility.interface';
@@ -14,44 +14,45 @@ import { IUser } from '../users/interfaces/user.interface';
 import { CONFIG_OPTIONS } from '../config/constants';
 import { IUserToken } from '../token/interfaces/user-token.interface';
 import { roleEnum } from '../users/enums/role';
+import * as faker from 'faker';
 
 type MockedFacility = { _id: string } & FacilityProps;
 
-const mockUserId = Date.now();
+const mockUserId = faker.random.uuid();
 
 const mockFacilityDto: CreateFacilityDto = {
-  name: 'Facilit mock name',
-  userId: mockUserId.toString(),
-  streetName: 'Facilit mock street name',
-  description: 'desc',
-  phone: '123',
-  city: 'city',
-  flatNumber: '',
-  houseNumber: '',
-  latitude: 0,
-  longitude: 0,
-  postcode: '123-AB',
+  name: faker.company.companyName(),
+  userId: mockUserId,
+  streetName: faker.address.streetName(),
+  description: faker.lorem.text(),
+  phone: faker.phone.phoneNumber(),
+  city: faker.address.city(),
+  flatNumber: faker.address.streetPrefix(),
+  houseNumber: faker.address.streetSuffix(),
+  latitude: Number(faker.address.latitude),
+  longitude: Number(faker.address.longitude),
+  postcode: faker.address.zipCode(),
 };
 
 const mockFacility: MockedFacility = {
   ...mockFacilityDto,
-  _id: 'abc123',
+  _id: faker.random.uuid(),
 };
 
 const mockFacilities: MockedFacility[] = [
   {
     ...mockFacilityDto,
-    _id: 'abc123'
+    _id: faker.random.uuid()
   },
   {
     ...mockFacilityDto,
-    _id: 'yzn123'
+    _id: faker.random.uuid()
   }
 ]
 
 const mockUpdatedFacility: MockedFacility = {
   ...mockFacility,
-  name: 'Edited facility'
+  name: faker.company.companyName()
 }
 
 describe('FacilityService', () => {
@@ -130,19 +131,23 @@ describe('FacilityService', () => {
 
   it('should update a facility successfully', async () => {
     jest.spyOn(facilityModel, 'findByIdAndUpdate').mockResolvedValueOnce(mockUpdatedFacility as IFacility);
-    jest.spyOn(tokenService, 'getUserId').mockResolvedValueOnce(Types.ObjectId.createFromTime(mockUserId));
+    jest.spyOn(tokenService, 'getUserId').mockResolvedValueOnce(Types.ObjectId.createFromTime(Number(mockUserId)));
     jest.spyOn(authService, 'getUserInfo').mockResolvedValueOnce({
-      _id: mockUserId.toString(),
-      email: 'email@example.com',
-      status: 'active',
-      lastName: 'lastName',
-      firstName: 'firstName',
-      roles: [roleEnum.user]
+      _id: mockUserId,
+      email: faker.internet.email(),
+      status: faker.random.arrayElement(['active', 'inactive']),
+      lastName: faker.name.firstName(),
+      firstName: faker.name.lastName(),
+      roles: faker.random.arrayElement([
+        [roleEnum.admin, roleEnum.user],
+        [roleEnum.admin],
+        [roleEnum.user]
+      ])
     });
     jest.spyOn(facilityModel, 'findById').mockResolvedValueOnce(mockUpdatedFacility as IFacility);
     const updatedFacility = await facilityService.update(mockUpdatedFacility._id, {
       name: mockUpdatedFacility.name
-    }, 'token');
+    }, faker.random.word());
     expect(updatedFacility).toEqual(mockUpdatedFacility)
   })
 });
