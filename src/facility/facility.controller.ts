@@ -68,7 +68,7 @@ export class FacilityController {
 
   @Delete('facilities/:id')
   @UseGuards(AuthGuard)
-  async delete(@Param('id') id: number, @Cookies() cookies) {
+  async delete(@Param('id') id: string, @Cookies() cookies) {
     return this.facilityService.delete(id, cookies.token).then();
   }
 }

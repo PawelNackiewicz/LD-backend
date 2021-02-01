@@ -47,7 +47,7 @@ export class FacilityService {
     }
   }
 
-  async delete(id: number, token: string): Promise<IFacility | void> {
+  async delete(id: string, token: string): Promise<IFacility | void> {
     const { roles, _id } = await this.authService.getUserInfo(token);
     const facilityToDelete = await this.facilityModel.findById(id);
     if (!facilityToDelete) throw new NotFoundException('Facility not found');
@@ -55,7 +55,7 @@ export class FacilityService {
       roles.includes(roleEnum.admin) ||
       String(_id) === facilityToDelete.userId
     ) {
-      return await this.facilityModel.findByIdAndDelete(id).exec();
+      return this.facilityModel.findByIdAndDelete(id);
     }
   }
 }

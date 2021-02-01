@@ -150,4 +150,23 @@ describe('FacilityService', () => {
     }, faker.random.word());
     expect(updatedFacility).toEqual(mockUpdatedFacility)
   })
+  it('should delete a facility successfully', async () => {
+    jest.spyOn(facilityModel, 'findByIdAndDelete').mockResolvedValueOnce(mockFacility as IFacility);
+    jest.spyOn(tokenService, 'getUserId').mockResolvedValueOnce(Types.ObjectId.createFromTime(Number(mockUserId)));
+    jest.spyOn(authService, 'getUserInfo').mockResolvedValueOnce({
+      _id: mockUserId,
+      email: faker.internet.email(),
+      status: faker.random.arrayElement(['active', 'inactive']),
+      lastName: faker.name.firstName(),
+      firstName: faker.name.lastName(),
+      roles: faker.random.arrayElement([
+        [roleEnum.admin, roleEnum.user],
+        [roleEnum.admin],
+        [roleEnum.user]
+      ])
+    });
+    jest.spyOn(facilityModel, 'findById').mockResolvedValueOnce(mockFacility as IFacility);
+    const facilityToDelete = await facilityService.delete(mockFacility._id, faker.random.word());
+    expect(facilityToDelete).toEqual(mockFacility);
+  });
 });
