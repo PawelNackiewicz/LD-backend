@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  NotFoundException,
   Param,
   Post,
   Put,
@@ -16,6 +17,7 @@ import { CreateFacilityDto } from './dto/create-facility.dto';
 import { IFacility } from './interfaces/facility.interface';
 import { Cookies } from '@nestjsplus/cookies/index';
 import { AuthGuard } from '../auth/auth.guard';
+import { Types } from 'mongoose';
 
 @ApiTags('facilities')
 @Controller()
@@ -31,13 +33,21 @@ export class FacilityController {
   @Get('users/:userId/facilities')
   @ApiOperation({ summary: 'Get all facilities by userId' })
   async findAllByUser(@Param('userId') userId: string): Promise<IFacility[]> {
-    return this.facilityService.findAllByUser(userId);
+    if (Types.ObjectId.isValid(userId)) {
+      return this.facilityService.findAllByUser(userId);
+    } else {
+      throw new NotFoundException();
+    }
   }
 
   @Get('facilities/:id')
   @ApiOperation({ summary: 'Get facility by id' })
   async find(@Param('id') id: string): Promise<IFacility> {
-    return this.facilityService.find(id);
+    if (Types.ObjectId.isValid(id)) {
+      return this.facilityService.find(id);
+    } else {
+      throw new NotFoundException();
+    }
   }
 
   @Post('facilities')
@@ -63,12 +73,20 @@ export class FacilityController {
     @Body() createFacilityDto: Partial<CreateFacilityDto>,
     @Cookies() cookies,
   ) {
-    return this.facilityService.update(id, createFacilityDto, cookies.token);
+    if (Types.ObjectId.isValid(id)) {
+      return this.facilityService.update(id, createFacilityDto, cookies.token);
+    } else {
+      throw new NotFoundException();
+    }
   }
 
   @Delete('facilities/:id')
   @UseGuards(AuthGuard)
   async delete(@Param('id') id: string, @Cookies() cookies) {
-    return this.facilityService.delete(id, cookies.token).then();
+    if (Types.ObjectId.isValid(id)) {
+      return this.facilityService.delete(id, cookies.token).then();
+    } else {
+      throw new NotFoundException();
+    }
   }
 }
