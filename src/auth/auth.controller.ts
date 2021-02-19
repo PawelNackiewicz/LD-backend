@@ -20,7 +20,7 @@ import { CreateUserDto } from '../users/dto/create-user.dto';
 import { LoginDto } from './dto/login.dto';
 import { SetCookies, Cookies } from '@nestjsplus/cookies/index';
 import { CookieService } from '../cookie/cookie.service';
-import { IReadableUser } from '../users/interfaces/readable-user.interface';
+import { ReadableUser } from '../users/interfaces/readable-user.interface';
 import { ConfirmAccountDto } from './dto/confirm-account.dto';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
@@ -58,7 +58,7 @@ export class AuthController {
   @ApiOperation({ summary: 'Get details of logged user' })
   @ApiResponse({ status: 403, description: 'Forbidden.' })
   @Get('sessions/me')
-  async getProfile(@Cookies() cookies): Promise<IReadableUser> {
+  async getProfile(@Cookies() cookies): Promise<ReadableUser> {
     return await this.authService.getUserInfo(cookies.token);
   }
 

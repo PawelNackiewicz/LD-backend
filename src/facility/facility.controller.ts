@@ -14,7 +14,7 @@ import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 import { FacilityService } from './facility.service';
 import { CreateFacilityDto } from './dto/create-facility.dto';
-import { IFacility } from './interfaces/facility.interface';
+import { Facility } from './interfaces/facility.interface';
 import { Cookies } from '@nestjsplus/cookies/index';
 import { AuthGuard } from '../auth/auth.guard';
 import { Types } from 'mongoose';
@@ -26,13 +26,13 @@ export class FacilityController {
 
   @Get('facilities')
   @ApiOperation({ summary: 'Get all facilities' })
-  async findAll(): Promise<IFacility[]> {
+  async findAll(): Promise<Facility[]> {
     return this.facilityService.findAll();
   }
 
   @Get('users/:userId/facilities')
   @ApiOperation({ summary: 'Get all facilities by userId' })
-  async findAllByUser(@Param('userId') userId: string): Promise<IFacility[]> {
+  async findAllByUser(@Param('userId') userId: string): Promise<Facility[]> {
     if (Types.ObjectId.isValid(userId)) {
       return this.facilityService.findAllByUser(userId);
     } else {
@@ -42,7 +42,7 @@ export class FacilityController {
 
   @Get('facilities/:id')
   @ApiOperation({ summary: 'Get facility by id' })
-  async find(@Param('id') id: string): Promise<IFacility> {
+  async find(@Param('id') id: string): Promise<Facility> {
     if (Types.ObjectId.isValid(id)) {
       return this.facilityService.find(id);
     } else {
@@ -57,7 +57,7 @@ export class FacilityController {
   @ApiOperation({ summary: 'Create facility' })
   async create(
     @Body(new ValidationPipe()) createFacilityDto: CreateFacilityDto,
-  ): Promise<IFacility> {
+  ): Promise<Facility> {
     return await this.facilityService.create(createFacilityDto);
   }
 
@@ -84,7 +84,7 @@ export class FacilityController {
   @UseGuards(AuthGuard)
   async delete(@Param('id') id: string, @Cookies() cookies) {
     if (Types.ObjectId.isValid(id)) {
-      return this.facilityService.delete(id, cookies.token).then();
+      return this.facilityService.delete(id, cookies.token);
     } else {
       throw new NotFoundException();
     }

@@ -7,7 +7,7 @@ import { TokenService } from '../token/token.service';
 import * as bcrypt from 'bcrypt';
 import { CreateUserDto } from '../users/dto/create-user.dto';
 import { roleEnum } from '../users/enums/role';
-import { IReadableUser } from '../users/interfaces/readable-user.interface';
+import { ReadableUser } from '../users/interfaces/readable-user.interface';
 import { statusEnum } from '../users/enums/status';
 import { LoginDto } from './dto/login.dto';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
@@ -100,7 +100,7 @@ export class AuthService {
     throw new NotFoundException('Confirmation error');
   }
 
-  async getUserInfo(token: string): Promise<IReadableUser> {
+  async getUserInfo(token: string): Promise<ReadableUser> {
     const userId = await this.tokenService.getUserId(
       AuthService.parseToken(token),
     );

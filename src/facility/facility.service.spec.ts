@@ -3,7 +3,7 @@ import { FacilityService } from './facility.service';
 import { DocumentQuery, Model, Types } from 'mongoose';
 import { getModelToken } from '@nestjs/mongoose';
 import { createMock } from '@golevelup/nestjs-testing';
-import { FacilityProps, IFacility } from './interfaces/facility.interface';
+import { FacilityProps, Facility } from './interfaces/facility.interface';
 import { CreateFacilityDto } from './dto/create-facility.dto';
 import { AuthService } from '../auth/auth.service';
 import { UserService } from '../users/user.service';
@@ -59,7 +59,7 @@ describe('FacilityService', () => {
   let facilityService: FacilityService;
   let authService: AuthService;
   let tokenService: TokenService;
-  let facilityModel: Model<IFacility>;
+  let facilityModel: Model<Facility>;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -72,7 +72,7 @@ describe('FacilityService', () => {
         TokenService,
         {
           provide: getModelToken('Facility'),
-          useValue: createMock<Model<IFacility>>(),
+          useValue: createMock<Model<Facility>>(),
         },
         {
           provide: getModelToken('User'),
@@ -92,7 +92,7 @@ describe('FacilityService', () => {
     facilityService = module.get<FacilityService>(FacilityService);
     authService = module.get<AuthService>(AuthService);
     tokenService = module.get<TokenService>(TokenService);
-    facilityModel = module.get<Model<IFacility>>(getModelToken('Facility'));
+    facilityModel = module.get<Model<Facility>>(getModelToken('Facility'));
   });
 
   it('should be defined', () => {
@@ -105,7 +105,7 @@ describe('FacilityService', () => {
 
   it('should return the facility object by ID', async () => {
     jest.spyOn(facilityModel, 'findById').mockReturnValueOnce(
-      createMock<DocumentQuery<IFacility, IFacility, unknown>>({
+      createMock<DocumentQuery<Facility, Facility, unknown>>({
         exec: jest.fn().mockResolvedValueOnce(mockFacility),
       }),
     );
@@ -115,7 +115,7 @@ describe('FacilityService', () => {
 
   it('should return all user facilities', async () => {
     jest.spyOn(facilityModel, 'find').mockReturnValueOnce(
-      createMock<DocumentQuery<IFacility[], IFacility, unknown>>({
+      createMock<DocumentQuery<Facility[], Facility, unknown>>({
         exec: jest.fn().mockResolvedValueOnce(mockFacilities),
       }),
     );
@@ -124,13 +124,13 @@ describe('FacilityService', () => {
   });
 
   it('should insert a new facility', async () => {
-    jest.spyOn(facilityModel, 'create').mockResolvedValueOnce(mockFacility as IFacility);
+    jest.spyOn(facilityModel, 'create').mockResolvedValueOnce(mockFacility as Facility);
     const newFacility = await facilityService.create(mockFacilityDto);
     expect(newFacility).toEqual(mockFacility)
   })
 
   it('should update a facility successfully', async () => {
-    jest.spyOn(facilityModel, 'findByIdAndUpdate').mockResolvedValueOnce(mockUpdatedFacility as IFacility);
+    jest.spyOn(facilityModel, 'findByIdAndUpdate').mockResolvedValueOnce(mockUpdatedFacility as Facility);
     jest.spyOn(tokenService, 'getUserId').mockResolvedValueOnce(Types.ObjectId.createFromTime(Number(mockUserId)));
     jest.spyOn(authService, 'getUserInfo').mockResolvedValueOnce({
       _id: mockUserId,
@@ -144,14 +144,14 @@ describe('FacilityService', () => {
         [roleEnum.user]
       ])
     });
-    jest.spyOn(facilityModel, 'findById').mockResolvedValueOnce(mockUpdatedFacility as IFacility);
+    jest.spyOn(facilityModel, 'findById').mockResolvedValueOnce(mockUpdatedFacility as Facility);
     const updatedFacility = await facilityService.update(mockUpdatedFacility._id, {
       name: mockUpdatedFacility.name
     }, faker.random.word());
     expect(updatedFacility).toEqual(mockUpdatedFacility)
   })
   it('should delete a facility successfully', async () => {
-    jest.spyOn(facilityModel, 'findByIdAndDelete').mockResolvedValueOnce(mockFacility as IFacility);
+    jest.spyOn(facilityModel, 'findByIdAndDelete').mockResolvedValueOnce(mockFacility as Facility);
     jest.spyOn(tokenService, 'getUserId').mockResolvedValueOnce(Types.ObjectId.createFromTime(Number(mockUserId)));
     jest.spyOn(authService, 'getUserInfo').mockResolvedValueOnce({
       _id: mockUserId,
@@ -165,7 +165,7 @@ describe('FacilityService', () => {
         [roleEnum.user]
       ])
     });
-    jest.spyOn(facilityModel, 'findById').mockResolvedValueOnce(mockFacility as IFacility);
+    jest.spyOn(facilityModel, 'findById').mockResolvedValueOnce(mockFacility as Facility);
     const facilityToDelete = await facilityService.delete(mockFacility._id, faker.random.word());
     expect(facilityToDelete).toEqual(mockFacility);
   });
