@@ -33,12 +33,7 @@ export class UserService {
   }
 
   async findByEmail(email: string): Promise<IUser> {
-    try {
-      return await this.userModel.findOne({ email }).exec();
-    } catch (e) {
-      console.log(e);
-      return null;
-    }
+    return await this.userModel.findOne({ email }).exec();
   }
 
   async update(id: string, payload: Partial<IUser>) {

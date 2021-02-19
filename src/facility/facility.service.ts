@@ -1,63 +1,39 @@
-import {
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { CreateFacilityDto } from './dto/create-facility.dto';
-import { IFacility } from './interfaces/facility.interface';
+import { Facility } from './interfaces/facility.interface';
 import { AuthService } from '../auth/auth.service';
 import { roleEnum } from '../users/enums/role';
 
 @Injectable()
 export class FacilityService {
   constructor(
-    @InjectModel('Facility') private readonly facilityModel: Model<IFacility>,
+    @InjectModel('Facility') private readonly facilityModel: Model<Facility>,
     private readonly authService: AuthService,
   ) {}
 
-  async create(createFacilityDto: CreateFacilityDto): Promise<void> {
-    try {
-      console.log(createFacilityDto);
-      const createdFacility = new this.facilityModel(createFacilityDto);
-      await createdFacility.save();
-    } catch (e) {
-      console.error(e);
-    }
+  async create(createFacilityDto: CreateFacilityDto): Promise<Facility> {
+    return await this.facilityModel.create(createFacilityDto as Facility);
   }
 
-  async findAll(): Promise<IFacility[]> {
-    try {
-      return this.facilityModel.find().exec();
-    } catch (e) {
-      console.error(e);
-      return null;
-    }
+  async findAll(): Promise<Facility[]> {
+    return await this.facilityModel.find().exec();
   }
 
-  async findAllByUser(userId: string): Promise<IFacility[]> {
-    try {
-      return await this.facilityModel.find({ userId }).exec();
-    } catch (e) {
-      console.error(e);
-      return null;
-    }
+  async findAllByUser(userId: string): Promise<Facility[]> {
+    return await this.facilityModel.find({ userId }).exec();
   }
 
-  async find(id: string): Promise<IFacility> {
-    try {
-      return this.facilityModel.findById(id);
-    } catch (e) {
-      console.error(e);
-      return null;
-    }
+  async find(id: string): Promise<Facility> {
+    return await this.facilityModel.findById(id).exec();
   }
 
   async update(
     id: string,
     createFacilityDto: Partial<CreateFacilityDto>,
     token: string,
-  ): Promise<void> {
+  ): Promise<Facility | void> {
     const { roles, _id } = await this.authService.getUserInfo(token);
     const facilityToEdit = await this.facilityModel.findById(id);
     if (!facilityToEdit) throw new NotFoundException('Facility not found');
@@ -66,28 +42,20 @@ export class FacilityService {
       roles.includes(roleEnum.admin) ||
       String(_id) === facilityToEdit.userId
     ) {
-      console.log(createFacilityDto); //check if DTO is correct?
-      await this.facilityModel
-        .findByIdAndUpdate(id, createFacilityDto)
-        .then(() => {
-          console.log('pawi');
-        })
-        .catch(() => {
-          console.log('error');
-        });
+      return this.facilityModel
+        .findByIdAndUpdate(id, createFacilityDto);
     }
   }
 
-  async delete(id: number, token: string): Promise<void> {
+  async delete(id: string, token: string): Promise<Facility | void> {
     const { roles, _id } = await this.authService.getUserInfo(token);
     const facilityToDelete = await this.facilityModel.findById(id);
-    if (!facilityToDelete)
-      throw new NotFoundException('Facility not found');
+    if (!facilityToDelete) throw new NotFoundException('Facility not found');
     if (
       roles.includes(roleEnum.admin) ||
       String(_id) === facilityToDelete.userId
     ) {
-      await this.facilityModel.findByIdAndDelete(id);
+      return this.facilityModel.findByIdAndDelete(id);
     }
   }
 }

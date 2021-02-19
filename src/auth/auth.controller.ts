@@ -20,7 +20,7 @@ import { CreateUserDto } from '../users/dto/create-user.dto';
 import { LoginDto } from './dto/login.dto';
 import { SetCookies, Cookies } from '@nestjsplus/cookies/index';
 import { CookieService } from '../cookie/cookie.service';
-import { IReadableUser } from '../users/interfaces/readable-user.interface';
+import { ReadableUser } from '../users/interfaces/readable-user.interface';
 import { ConfirmAccountDto } from './dto/confirm-account.dto';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
@@ -33,7 +33,7 @@ export class AuthController {
     private readonly cookieService: CookieService,
   ) {}
 
-  @Post('register')
+  @Post('users')
   @ApiOperation({ summary: 'Create user' })
   async registration(
     @Body(new ValidationPipe()) createUserDto: CreateUserDto,
@@ -41,7 +41,7 @@ export class AuthController {
     return this.authService.register(createUserDto);
   }
 
-  @Post('login')
+  @Post('sessions')
   @ApiResponse({ status: 404, description: 'Not found.' })
   @ApiResponse({ status: 401, description: 'Unauthorized.' })
   @ApiOperation({ summary: 'Sign in user' })
@@ -57,8 +57,8 @@ export class AuthController {
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get details of logged user' })
   @ApiResponse({ status: 403, description: 'Forbidden.' })
-  @Get('session/me')
-  async getProfile(@Cookies() cookies): Promise<IReadableUser> {
+  @Get('sessions/me')
+  async getProfile(@Cookies() cookies): Promise<ReadableUser> {
     return await this.authService.getUserInfo(cookies.token);
   }
 
