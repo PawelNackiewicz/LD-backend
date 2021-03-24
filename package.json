@@ -18,14 +18,14 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json",
-    "prepare": "husky install"
+    "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
     "@golevelup/nestjs-testing": "^0.1.2",
     "@nestjs/common": "^7.0.0",
     "@nestjs/config": "^0.5.0",
     "@nestjs/core": "^7.0.0",
+    "@nestjs/graphql": "^7.10.3",
     "@nestjs/jwt": "^7.1.0",
     "@nestjs/mongoose": "^7.0.2",
     "@nestjs/passport": "^7.1.0",
@@ -40,6 +40,7 @@
     "crypto": "^1.0.1",
     "dotenv": "^8.2.0",
     "faker": "^5.2.0",
+    "graphql": "^15.5.0",
     "jose": "^1.28.0",
     "moment": "^2.27.0",
     "mongoose": "^5.9.26",
@@ -54,7 +55,6 @@
   },
   "devDependencies": {
     "@nestjs/cli": "^7.0.0",
-    "@nestjs/jwt": "^7.1.0",
     "@nestjs/schematics": "^7.0.0",
     "@nestjs/testing": "^7.0.0",
     "@types/bcrypt": "^3.0.0",
