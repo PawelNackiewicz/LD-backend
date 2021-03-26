@@ -3,10 +3,6 @@ version: '3'
 
 services:
   lokalne-dobrodziejstwa:
-    image: mongo-express
+    image: mongo:latest
     ports:
-      - '5432:5432'
-    environment:
-      POSTGRES_USER: 'ld_user'
-      POSTGRES_DBNAME: 'lokalne_dobrodziejstwa'
-      POSTGRES_PASSWORD: 'dobrodziejstwa'
+      - '27017:27017'
