@@ -45,7 +45,7 @@ export class AuthService {
     return true;
   }
 
-  async prepareConfirmation(user: IUser) {
+  async prepareConfirmation(user: IUser): Promise<void> {
     const token = await this.tokenService.getActivationToken(user.email);
     const confirmLink = `${this.clientAppUrl}/auth/confirm?token=${token}`;
     await this.mailService.sendConfirmationMail(user, confirmLink);
@@ -82,12 +82,14 @@ export class AuthService {
       AuthService.parseToken(changePasswordDto.token),
     )) as ITokenPayload;
     const user = await this.userService.findByEmail(data.userEmail);
+    console.log(user);
+    
     await this.userService.update(user._id, { password });
     await this.tokenService.deleteAll(user._id);
     return true;
   }
 
-  async confirmUser({ token }: ConfirmAccountDto) {
+  async confirmUser({ token }: ConfirmAccountDto): Promise<IUser> {
     const data = (await this.tokenService.verifyActivationToken(
       token,
     )) as ITokenPayload;

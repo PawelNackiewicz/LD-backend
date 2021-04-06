@@ -3,7 +3,7 @@ import { ICookiesRequest } from './interfaces/cookiesRequest.interface';
 
 @Injectable()
 export class CookieService {
-  setTokenInCookies(req: ICookiesRequest, token: string) {
+  setTokenInCookies(req: ICookiesRequest, token: string): void {
     req._cookies = [
       {
         name: 'token',

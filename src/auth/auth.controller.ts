@@ -24,6 +24,8 @@ import { ReadableUser } from '../users/interfaces/readable-user.interface';
 import { ConfirmAccountDto } from './dto/confirm-account.dto';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
+import { ICookiesRequest } from 'src/cookie/interfaces/cookiesRequest.interface';
+import { ICookie } from 'src/cookie/interfaces/cookie.interface';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -47,7 +49,7 @@ export class AuthController {
   @ApiOperation({ summary: 'Sign in user' })
   @SetCookies()
   async login(
-    @Request() req,
+    @Request() req: ICookiesRequest,
     @Body(new ValidationPipe()) loginDto: LoginDto,
   ): Promise<void> {
     const accessToken = await this.authService.login(loginDto);
@@ -58,7 +60,7 @@ export class AuthController {
   @ApiOperation({ summary: 'Get details of logged user' })
   @ApiResponse({ status: 403, description: 'Forbidden.' })
   @Get('sessions/me')
-  async getProfile(@Cookies() cookies): Promise<ReadableUser> {
+  async getProfile(@Cookies() cookies: ICookie): Promise<ReadableUser> {
     return await this.authService.getUserInfo(cookies.token);
   }
 
@@ -84,6 +86,8 @@ export class AuthController {
   async changePassword(
     @Body(new ValidationPipe()) changePasswordDto: ChangePasswordDto,
   ): Promise<boolean> {
+    console.log(changePasswordDto);
+    
     return this.authService.changePasswordByToken(changePasswordDto);
   }
 }
