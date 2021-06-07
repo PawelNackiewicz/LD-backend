@@ -56,4 +56,24 @@ export class CreateFacilityDto {
   @IsNumber()
   @IsOptional()
   readonly latitude: number;
+
+  @ApiProperty({ description: 'The logo path of a facility.' })
+  @IsString()
+  @IsOptional()
+  readonly logoPath: string;
+
+  @ApiProperty({ description: 'The background image path of a facility.' })
+  @IsString()
+  @IsOptional()
+  readonly backgroundImagePath: string;
+
+  @ApiProperty({ description: 'The facebook url of a facility.' })
+  @IsString()
+  @IsOptional()
+  readonly facebook: string;
+
+  @ApiProperty({ description: 'The website url of a facility.' })
+  @IsString()
+  @IsOptional()
+  readonly website: string;
 }
